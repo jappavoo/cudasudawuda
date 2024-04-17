@@ -1,0 +1,9 @@
+format: jb-book
+root: cudasudawuda_intro
+parts:
+- caption: 'Part 1'
+  numbered: true
+  chapters:
+  - file: part1/gettingstarted
+    sections: 
+    - file: part1/helloworld
