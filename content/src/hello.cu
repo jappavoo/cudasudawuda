@@ -14,11 +14,3 @@ main(void)
     cudaDeviceSynchronize();
     cudaDeviceReset();
 }
-
-
-
-
-
-
-
-

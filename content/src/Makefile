@@ -1,6 +1,9 @@
 all: hello gpuinfo
 hello: hello.cu
-	nvcc $< -o $@
+	nvcc $(CFLAGS) $< -o $@
 
 gpuinfo: gpuinfo.cu
-	nvcc $< -o $@
+	nvcc $(CFLAGS) $< -o $@
+
+clean:
+	-${RM} -rf $(wildcard hello gpuinfo)
