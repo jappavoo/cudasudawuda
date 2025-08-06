@@ -1,0 +1,1 @@
+oc get -o yaml  is/csw-dev-f25 -n redhat-ods-applications > uploaded_imagestream.yaml

@@ -1,0 +1,23 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: csw-dev-f25
+  namespace: redhat-ods-applications
+  labels:
+    opendatahub.io/notebook-image: "true"
+  annotations:
+    opendatahub.io/notebook-image-url: "http://quay.io/jappavoo/csw-dev:nerctest-current"
+    opendatahub.io/notebook-image-name: "csw-dev-F25"
+    opendatahub.io/notebook-image-desc: "csw-dev-F25"
+spec:
+  lookupPolicy:
+    local: true
+  tags:
+    - name: latest
+      from:
+        kind: DockerImage
+        name: 'quay.io/jappavoo/csw-dev:nerctest-current'
+      importPolicy:
+        scheduled: true
+      referencePolicy:
+        type: Source

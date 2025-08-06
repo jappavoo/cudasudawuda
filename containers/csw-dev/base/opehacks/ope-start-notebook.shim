@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Shim to emit warning and call start-notebook.py
+echo "WARNING: $0 : $@ : Using start-notebook shim to fix potential lack of quoting on arguments"
+
+
+args=("$@")
+ts=''
+for ((i=0; i<${#args[@]}; i++)); do
+#    echo $i: "${args[$i]}"
+    if [[ ${args[$i]} =~ ^--ServerApp.tornado_settings= ]]; then
+        targ=${args[$i]}
+        targ=${targ#*=}
+        ts="$ts,\"${targ%%:*}\":\"${targ#*:}\""
+        args[$i]=''
+        echo "WARNING: $0: FIXME: JAHACK!!! rewriting ServerApp.torondo_settings: $ts"
+    fi
+done
+
+if [[ -n $NOTEBOOK_ARGS ]]; then
+    echo "WARNING: $0 : check $NOTEBOOK_ARGS for bad quoting"
+    if [[ "$NOTEBOOK_ARGS" =~ ^.*--ServerApp.tornado_settings=\{ ]]; then
+           echo "WARNING: Found bad quoting trying to fix: $NOTEBOOK_ARGS"     
+           prefix="${NOTEBOOK_ARGS%%--ServerApp.tornado_settings=*}"
+           value="${NOTEBOOK_ARGS##*--ServerApp.tornado_settings=}"
+	   suffix="${value#*\}}"
+	   value="${value%\}*}}"
+	   export NOTEBOOK_ARGS="$prefix --ServerApp.tornado_settings='$value' $suffix"
+	   echo "WARNING: rewrote NOTEBOOK_ARGS : $NOTEBOOK_ARGS"
+    fi    
+fi
+
+ts=${ts#,}
+if [[ -n $ts ]]; then
+  echo "WARNING: $0 calling start-notebook.py with hacked up --ServerApp.tornado_settings commandline arg: $ts"
+  exec /usr/local/bin/start-notebook.py "${args[@]}" "--ServerApp.tornado_settings={$ts}"
+else
+  exec /usr/local/bin/start-notebook.py "${args[@]}"
+fi

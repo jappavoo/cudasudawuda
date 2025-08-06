@@ -1,0 +1,8 @@
+ca-certificates
+cmake
+xdg-utils
+dos2unix
+bsdmainutils
+man-db
+emacs
+vim

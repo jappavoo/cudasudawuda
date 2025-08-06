@@ -1,0 +1,230 @@
+## Dockerfile for constructing the base Open Education Effort (OPE)
+## container.  This container contains everything required for authoring OPE courses
+## Well is should anyway ;-)
+
+# to avoid empty arg warnings in from statement we put defaults in here
+ARG FROM_REG=dummyreg
+ARG FROM_IMAGE=dummyimage
+ARG FROM_TAG=dummytag
+
+FROM ${FROM_REG}/${FROM_IMAGE}:${FROM_TAG}
+
+LABEL maintainer="Jonathan Appavoo <jappavoo@bu.edu>"
+
+ARG ADDITIONAL_DISTRO_PACKAGES
+ARG PYTHON_PREREQ_VERSIONS
+ARG PYTHON_INSTALL_PACKAGES
+ARG PIP_INSTALL_PACKAGES
+
+ARG JUPYTER_ENABLE_EXTENSIONS
+ARG JUPYTER_DISABLE_EXTENSIONS
+
+# Fix: https://github.com/hadolint/hadolint/wiki/DL4006
+# Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Add a "USER root" statement followed by RUN statements to install system packages using apt-get,
+# change file permissions, etc.
+
+# install linux packages that we require for pdf authoring
+USER root
+
+
+
+RUN dpkg --add-architecture i386 && \
+    apt-get -y update --fix-missing && \
+    apt-get -y install ${ADDITIONAL_DISTRO_PACKAGES} && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+
+#### https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/12.8.1/ubuntu2404/base/Dockerfile?ref_type=heads
+
+ENV NVARCH=x86_64
+ENV NVIDIA_REQUIRE_CUDA="cuda>=12.8 brand=unknown,driver>=470,driver<471 brand=grid,driver>=470,driver<471 brand=tesla,driver>=470,driver<471 brand=nvidia,driver>=470,driver<471 brand=quadro,driver>=470,driver<471 brand=quadrortx,driver>=470,driver<471 brand=nvidiartx,driver>=470,driver<471 brand=vapps,driver>=470,driver<471 brand=vpc,driver>=470,driver<471 brand=vcs,driver>=470,driver<471 brand=vws,driver>=470,driver<471 brand=cloudgaming,driver>=470,driver<471 brand=unknown,driver>=535,driver<536 brand=grid,driver>=535,driver<536 brand=tesla,driver>=535,driver<536 brand=nvidia,driver>=535,driver<536 brand=quadro,driver>=535,driver<536 brand=quadrortx,driver>=535,driver<536 brand=nvidiartx,driver>=535,driver<536 brand=vapps,driver>=535,driver<536 brand=vpc,driver>=535,driver<536 brand=vcs,driver>=535,driver<536 brand=vws,driver>=535,driver<536 brand=cloudgaming,driver>=535,driver<536 brand=unknown,driver>=550,driver<551 brand=grid,driver>=550,driver<551 brand=tesla,driver>=550,driver<551 brand=nvidia,driver>=550,driver<551 brand=quadro,driver>=550,driver<551 brand=quadrortx,driver>=550,driver<551 brand=nvidiartx,driver>=550,driver<551 brand=vapps,driver>=550,driver<551 brand=vpc,driver>=550,driver<551 brand=vcs,driver>=550,driver<551 brand=vws,driver>=550,driver<551 brand=cloudgaming,driver>=550,driver<551 brand=unknown,driver>=560,driver<561 brand=grid,driver>=560,driver<561 brand=tesla,driver>=560,driver<561 brand=nvidia,driver>=560,driver<561 brand=quadro,driver>=560,driver<561 brand=quadrortx,driver>=560,driver<561 brand=nvidiartx,driver>=560,driver<561 brand=vapps,driver>=560,driver<561 brand=vpc,driver>=560,driver<561 brand=vcs,driver>=560,driver<561 brand=vws,driver>=560,driver<561 brand=cloudgaming,driver>=560,driver<561 brand=unknown,driver>=565,driver<566 brand=grid,driver>=565,driver<566 brand=tesla,driver>=565,driver<566 brand=nvidia,driver>=565,driver<566 brand=quadro,driver>=565,driver<566 brand=quadrortx,driver>=565,driver<566 brand=nvidiartx,driver>=565,driver<566 brand=vapps,driver>=565,driver<566 brand=vpc,driver>=565,driver<566 brand=vcs,driver>=565,driver<566 brand=vws,driver>=565,driver<566 brand=cloudgaming,driver>=565,driver<566"
+ENV NV_CUDA_CUDART_VERSION=12.8.90-1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gnupg2 curl ca-certificates && \
+    curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/${NVARCH}/3bf863cc.pub | apt-key add - && \
+    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/${NVARCH} /" > /etc/apt/sources.list.d/cuda.list && \
+    apt-get purge --autoremove -y curl \
+    && rm -rf /var/lib/apt/lists/*
+    
+ENV CUDA_VERSION=12.8.1
+# For libraries in the cuda-compat-* package: https://docs.nvidia.com/cuda/eula/index.html#attachment-a
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cuda-cudart-12-8=${NV_CUDA_CUDART_VERSION} \
+    cuda-compat-12-8 \
+    && rm -rf /var/lib/apt/lists/*
+# Required for nvidia-docker v1
+RUN echo "/usr/local/cuda/lib64" >> /etc/ld.so.conf.d/nvidia.conf
+ENV PATH=/usr/local/cuda/bin:${PATH}
+ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64
+
+# nvidia-container-runtime
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+####https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/12.8.1/ubuntu2404/runtime/Dockerfile?ref_type=heads
+
+ENV NV_CUDA_LIB_VERSION=12.8.1-1
+
+ENV NV_NVTX_VERSION=12.8.90-1
+ENV NV_LIBNPP_VERSION=12.3.3.100-1
+ENV NV_LIBNPP_PACKAGE=libnpp-12-8=${NV_LIBNPP_VERSION}
+ENV NV_LIBCUSPARSE_VERSION=12.5.8.93-1
+ENV NV_LIBCUBLAS_PACKAGE_NAME=libcublas-12-8
+ENV NV_LIBCUBLAS_VERSION=12.8.4.1-1
+ENV NV_LIBCUBLAS_PACKAGE=${NV_LIBCUBLAS_PACKAGE_NAME}=${NV_LIBCUBLAS_VERSION}
+ENV NV_LIBNCCL_PACKAGE_NAME=libnccl2
+ENV NV_LIBNCCL_PACKAGE_VERSION=2.25.1-1
+ENV NCCL_VERSION=2.25.1-1
+ENV NV_LIBNCCL_PACKAGE=${NV_LIBNCCL_PACKAGE_NAME}=${NV_LIBNCCL_PACKAGE_VERSION}+cuda12.8
+
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cuda-libraries-12-8=${NV_CUDA_LIB_VERSION} \
+    ${NV_LIBNPP_PACKAGE} \
+    cuda-nvtx-12-8=${NV_NVTX_VERSION} \
+    libcusparse-12-8=${NV_LIBCUSPARSE_VERSION} \
+    ${NV_LIBCUBLAS_PACKAGE} \
+    ${NV_LIBNCCL_PACKAGE} \
+    && rm -rf /var/lib/apt/lists/*
+# Keep apt from auto upgrading the cublas and nccl packages. See https://gitlab.com/nvidia/container-images/cuda/-/issues/88
+RUN apt-mark hold ${NV_LIBCUBLAS_PACKAGE_NAME} ${NV_LIBNCCL_PACKAGE_NAME}
+
+
+#### FROM https://gitlab.com/nvidia/container-images/cuda/-/blob/master/dist/12.8.1/ubuntu2404/devel/Dockerfile?ref_type=heads
+ENV NV_CUDA_CUDART_DEV_VERSION=12.8.90-1
+ENV NV_NVML_DEV_VERSION=12.8.90-1
+ENV NV_LIBCUSPARSE_DEV_VERSION=12.5.8.93-1
+ENV NV_LIBNPP_DEV_VERSION=12.3.3.100-1
+ENV NV_LIBNPP_DEV_PACKAGE=libnpp-dev-12-8=${NV_LIBNPP_DEV_VERSION}
+ENV NV_LIBCUBLAS_DEV_VERSION=12.8.4.1-1
+ENV NV_LIBCUBLAS_DEV_PACKAGE_NAME=libcublas-dev-12-8
+ENV NV_LIBCUBLAS_DEV_PACKAGE=${NV_LIBCUBLAS_DEV_PACKAGE_NAME}=${NV_LIBCUBLAS_DEV_VERSION}
+ENV NV_CUDA_NSIGHT_COMPUTE_VERSION=12.8.1-1
+ENV NV_CUDA_NSIGHT_COMPUTE_DEV_PACKAGE=cuda-nsight-compute-12-8=${NV_CUDA_NSIGHT_COMPUTE_VERSION}
+ENV NV_NVPROF_VERSION=12.8.90-1
+ENV NV_NVPROF_DEV_PACKAGE=cuda-nvprof-12-8=${NV_NVPROF_VERSION}
+ENV NV_LIBNCCL_DEV_PACKAGE_NAME=libnccl-dev
+ENV NV_LIBNCCL_DEV_PACKAGE_VERSION=2.25.1-1
+ENV NCCL_VERSION=2.25.1-1
+ENV NV_LIBNCCL_DEV_PACKAGE=${NV_LIBNCCL_DEV_PACKAGE_NAME}=${NV_LIBNCCL_DEV_PACKAGE_VERSION}+cuda12.8
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cuda-cudart-dev-12-8=${NV_CUDA_CUDART_DEV_VERSION} \
+    cuda-command-line-tools-12-8=${NV_CUDA_LIB_VERSION} \
+    cuda-minimal-build-12-8=${NV_CUDA_LIB_VERSION} \
+    cuda-libraries-dev-12-8=${NV_CUDA_LIB_VERSION} \
+    cuda-nvml-dev-12-8=${NV_NVML_DEV_VERSION} \
+    ${NV_NVPROF_DEV_PACKAGE} \
+    ${NV_LIBNPP_DEV_PACKAGE} \
+    libcusparse-dev-12-8=${NV_LIBCUSPARSE_DEV_VERSION} \
+    ${NV_LIBCUBLAS_DEV_PACKAGE} \
+    ${NV_LIBNCCL_DEV_PACKAGE} \
+    ${NV_CUDA_NSIGHT_COMPUTE_DEV_PACKAGE} \
+    && rm -rf /var/lib/apt/lists/*
+    
+# Keep apt from auto upgrading the cublas and nccl packages. See https://gitlab.com/nvidia/container-images/cuda/-/issues/88
+RUN apt-mark hold ${NV_LIBCUBLAS_DEV_PACKAGE_NAME} ${NV_LIBNCCL_DEV_PACKAGE_NAME}
+ENV LIBRARY_PATH=/usr/local/cuda/lib64/stubs
+
+#####
+
+# Now that distro packages are installed lets install the python packages we want
+# This was inspired by
+# https://github.com/jupyter/docker-stacks/blob/b186ce5fea6aa9af23fb74167dca52908cb28d71/scipy-notebook/Dockerfile
+
+USER ${NB_USER}
+
+# sometimes there are problems with the existing version of installed python packages
+# these need to be installed to the prerequisite versions before we can install the rest of the
+# packages. Install Python 3 packages
+#RUN python --version
+
+RUN mamba install --yes ${PYTHON_PREREQ_VERSIONS} && \
+    mamba install --yes ${PYTHON_INSTALL_PACKAGES} && \
+    pip install ${PIP_INSTALL_PACKAGES} && \
+    mamba clean -afy
+
+# Import matplotlib the first time to build the font cache.
+ENV XDG_CACHE_HOME="/home/${NB_USER}/.cache/"
+
+# enable extensions
+RUN for ext in ${JUPYTER_ENABLE_EXTENSIONS} ; do \
+   jupyter nbextension enable "$ext" ; \
+   done
+
+# disable extensions -- disabling core extensions can be really useful for customizing
+#                       jupyterlab user experience
+RUN for ext in ${JUPYTER_DISABLE_EXTENSIONS} ; do \
+   jupyter labextension disable "$ext" ; \
+   done
+
+# copy overrides.json
+COPY settings ${CONDA_DIR}/share/jupyter/lab/settings
+
+USER root
+
+RUN mkdir /home/ope && \
+    cd /home/ope && \
+    git clone https://github.com/OPEFFORT/tools.git . && \
+    ./install.sh && \
+    chown jovyan /home/ope && \
+    fix-permissions /home/ope
+
+# final bits of cleanup
+RUN touch /home/${NB_USER}/.hushlogin && \
+# use a short prompt to improve default behaviour in presentations
+    echo "export PS1='\$ '" >> /home/${NB_USER}/.bashrc && \
+# work around bug when term is xterm and emacs runs in xterm.js -- causes escape characters in file
+    echo "export TERM=linux" >> /home/${NB_USER}/.bashrc && \
+# finally remove default working directory from joyvan home
+    rmdir /home/${NB_USER}/work && \
+    # as per the nbstripout readme we setup nbstripout be always be used for the joyvan user for all repos
+    nbstripout --install --system 
+
+# Static Customize for OPE USER ID choices
+# To avoid problems with start.sh logic we do not modify user name
+# FIXME: Add support for swinging home directory if you want to point to a mounted volume
+ARG OPE_UID
+ENV NB_UID=${OPE_UID}
+
+ARG OPE_GID
+ENV NB_GID=${OPE_GID}
+
+ARG OPE_GROUP
+ENV NB_GROUP=${OPE_GROUP}
+
+ARG EXTRA_CHOWN
+ARG CHOWN_HOME=yes
+ARG CHOWN_HOME_OPTS="-R"
+ARG CHOWN_EXTRA_OPTS='-R'
+ARG CHOWN_EXTRA="${EXTRA_CHOWN} ${CONDA_DIR}"
+
+# Done customization
+
+# jupyter-stack contains logic to run custom start hook scripts from
+# two locations -- /usr/local/bin/start-notebook.d and
+#                 /usr/local/bin/before-notebook.d
+# and scripts in these directories are run automatically
+# an opportunity to set things up based on dynamic facts such as user name
+
+RUN /usr/local/bin/start.sh true; \
+    echo "hardcoding $NB_USER to uid=$NB_UID and group name $NB_GROUP with gid=$NB_GID shell to /bin/bash" ; \
+    usermod -s /bin/bash $NB_USER ; \
+    [[ -w /etc/passwd ]] && echo "Removing write access to /etc/passwd" && chmod go-w /etc/passwd
+
+COPY start-notebook.d /usr/local/bin/start-notebook.d
+
+#### JA HORRIBLE HACK override start-notebook.sh if start-notebook.py exists as the depricated trampoline start-notebook.sh is not robust
+COPY opehacks /usr/local/opehacks
+
+#RUN [[ -a /usr/local/bin/start-notebook.py && -a /usr/local/bin/start-notebook.sh ]] && \
+#     { cp /usr/local/bin/start-notebook.sh /usr/local/bin/start-notebook.sh.orig; \
+#     cat /usr/local/opehacks/start-notebook.sh > /usr/local/bin/start-notebook.sh }
+
+RUN [[ -a /usr/local/bin/start-notebook.py && -a /usr/local/bin/start-notebook.sh ]] && \
+    { mv /usr/local/bin/start-notebook.sh /usr/local/bin/start-notebook.sh.orig; \
+         ln -s /usr/local/bin/start-notebook.py /usr/local/bin/start-notebook.sh; } 

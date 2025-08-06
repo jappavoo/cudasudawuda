@@ -1,0 +1,58 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"image.openshift.io/v1","kind":"ImageStream","metadata":{"annotations":{"opendatahub.io/notebook-image-desc":"csw-dev-F25","opendatahub.io/notebook-image-name":"csw-dev-F25","opendatahub.io/notebook-image-url":"quay.io/jappavoo/csw-dev:nerctest-current"},"labels":{"opendatahub.io/notebook-image":"true"},"name":"csw-dev-f25","namespace":"redhat-ods-applications"},"spec":{"lookupPolicy":{"local":true},"tags":[{"from":{"kind":"DockerImage","name":"quay.io/jappavoo/csw-dev:nerctest-current"},"importPolicy":{"scheduled":true},"name":"latest","referencePolicy":{"type":"Source"}}]}}
+    opendatahub.io/notebook-image-desc: csw-dev-F25
+    opendatahub.io/notebook-image-name: csw-dev-F25
+    opendatahub.io/notebook-image-url: quay.io/jappavoo/csw-dev:nerctest-current
+    openshift.io/image.dockerRepositoryCheck: "2025-08-06T15:24:43Z"
+  creationTimestamp: "2025-08-05T18:36:35Z"
+  generation: 6
+  labels:
+    opendatahub.io/notebook-image: "true"
+  name: csw-dev-f25
+  namespace: redhat-ods-applications
+  resourceVersion: "1352721816"
+  uid: dbbfe996-f86f-4f4d-a00f-1a6c4adf6eae
+spec:
+  lookupPolicy:
+    local: true
+  tags:
+  - annotations: null
+    from:
+      kind: DockerImage
+      name: quay.io/jappavoo/csw-dev:nerctest-current
+    generation: 6
+    importPolicy:
+      importMode: Legacy
+      scheduled: true
+    name: latest
+    referencePolicy:
+      type: Source
+status:
+  dockerImageRepository: image-registry.openshift-image-registry.svc:5000/redhat-ods-applications/csw-dev-f25
+  tags:
+  - items:
+    - created: "2025-08-06T15:24:43Z"
+      dockerImageReference: quay.io/jappavoo/csw-dev@sha256:9c73041578fd90d8ce79597e29ef36aecc195f437bda3c08f3b3c9a78fc207d6
+      generation: 6
+      image: sha256:9c73041578fd90d8ce79597e29ef36aecc195f437bda3c08f3b3c9a78fc207d6
+    - created: "2025-08-06T12:05:58Z"
+      dockerImageReference: quay.io/jappavoo/csw-dev@sha256:cd2081338edb1494efc4f0f819a670970f99084caff7db3de0cd8fb19e6af0b3
+      generation: 5
+      image: sha256:cd2081338edb1494efc4f0f819a670970f99084caff7db3de0cd8fb19e6af0b3
+    - created: "2025-08-06T11:09:44Z"
+      dockerImageReference: quay.io/jappavoo/csw-dev@sha256:b21aff36797de72fe76e575f3e0addf560fa7565adcdf998186f614c779baf2d
+      generation: 4
+      image: sha256:b21aff36797de72fe76e575f3e0addf560fa7565adcdf998186f614c779baf2d
+    - created: "2025-08-06T03:09:42Z"
+      dockerImageReference: quay.io/jappavoo/csw-dev@sha256:21be1c62ee6efbc13e0755335046a19e6d5c72f375b2eb30a0b4372e1d1915ef
+      generation: 3
+      image: sha256:21be1c62ee6efbc13e0755335046a19e6d5c72f375b2eb30a0b4372e1d1915ef
+    - created: "2025-08-05T18:36:36Z"
+      dockerImageReference: quay.io/jappavoo/csw-dev@sha256:b022a5a8947e796a26463560e94e8b45f16dbcc548f4ed47ffd38208e49c156e
+      generation: 2
+      image: sha256:b022a5a8947e796a26463560e94e8b45f16dbcc548f4ed47ffd38208e49c156e
+    tag: latest

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+oc create rolebinding ${wb}-edit --clusterrole=edit \
+  --serviceaccount=$(oc project -q):$wb
+oc create role ${wb}-edit-jobs \
+  --verb=get,list,watch,create,update,patch,delete \
+  --resource=jobs
+c create rolebinding ${wb}-edit-jobs --role=${wb}-edit-jobs \
+  --serviceaccount=$(oc project -q):${wb}
