@@ -1,0 +1,6 @@
+#!/bin/bash
+
+DATE_TAG=$(date +"_%m.%d.%y_%H.%M.%S")
+podman tag  jappavoo/csw-dev:nerctest-current jappavoo/csw-dev:nerctest-${DATE_TAG}
+podman push jappavoo/csw-dev:nerctest-${DATE_TAG} quay.io/jappavoo/csw-dev:nerctest-${DATE_TAG}
+podman push jappavoo/csw-dev:nerctest-current quay.io/jappavoo/csw-dev:nerctest-current
