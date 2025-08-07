@@ -1,7 +1,0 @@
-FROM quay.io/nerc-images/cuda-jupyter-tensorflow:latest
-USER root
-RUN dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo
-RUN dnf install -y \
-  cmake
-
-USER 1001
