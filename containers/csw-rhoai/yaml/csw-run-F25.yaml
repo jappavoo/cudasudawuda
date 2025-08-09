@@ -4,11 +4,9 @@ metadata:
   name: csw-run-f25
   namespace: redhat-ods-applications
   labels:
-    opendatahub.io/notebook-image: "true"
+    opendatahub.io/notebook-image: "false"
   annotations:
     opendatahub.io/notebook-image-url: "http://quay.io/jappavoo/csw-run:nerctest-current"
-    opendatahub.io/notebook-image-name: "csw-run-F25"
-    opendatahub.io/notebook-image-desc: "csw-run-F25"
 spec:
   lookupPolicy:
     local: true

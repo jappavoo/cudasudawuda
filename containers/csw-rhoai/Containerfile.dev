@@ -1,0 +1,76 @@
+# Ultimately to be consistent with the Red Hat Open AI (RHOAI) environment
+# (and attendant HW) that is avaiable to us in the NERC MOC we base our
+# images on the RHOAI provided images.  The src for these are maintained
+# here:
+#  https://github.com/red-hat-data-services/notebooks
+# the images are published here:
+#  https://quay.io/organization/modh
+#
+
+# based on our analysis of https://github.com/opendatahub-io/notebooks/blob/main/jupyter/pytorch/ubi9-python-3.11/Dockerfile.cuda
+# we are choosing the associated published image found ont the opendatahub workbenches
+FROM quay.io/modh/cuda-notebooks:cuda-jupyter-minimal-ubi9-python-3.11-20250808
+USER root
+
+# the following repo is already available from the base so we don't re add but here
+# for documentation purposes
+# as per https://docs.nvidia.com/cuda/cuda-installation-guide-linux/#network-repo-installation-for-fedora
+# we do this so that additional repositories are available even non-NVIDIA ones
+#RUN dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo
+
+RUN dnf install -y \
+    cmake \
+    dos2unix \
+    bc \
+    perl \
+    ncurses-devel && \
+    yum clean all \
+    && rm -rf /var/cache/yum/*
+
+# ubi-9 does not have cmp so we install gnu diffutils
+RUN wget  https://ftp.gnu.org/gnu/diffutils/diffutils-3.12.tar.gz && \
+    tar -zxf diffutils-3.12.tar.gz && \
+    { cd diffutils-3.12; ./configure ; cd .. ; } && \
+    make -C diffutils-3.12 && \
+    make -C diffutils-3.12 install && \
+    rm -rf diffutils*
+
+# texinfo
+RUN wget https://ftp.gnu.org/gnu/texinfo/texinfo-7.2.tar.gz && \
+    tar -xf texinfo-7.2.tar.gz && \
+    { cd texinfo-7.2; ./configure ; cd .. ; } && \
+    make -C texinfo-7.2 && \
+    make -C texinfo-7.2 install && \
+    rm -rf texinfo* 
+
+# emacs
+RUN  wget https://ftp.gnu.org/pub/gnu/emacs/emacs-30.1.tar.gz && \
+     tar -zxf emacs-30.1.tar.gz && \
+     { cd emacs-30.1; ./configure --without-x --with-gnutls=ifavailable; cd .. ; } && \
+     make -C emacs-30.1 && \
+     make -C emacs-30.1 install && \
+     rm -rf emacs-30.1 
+
+RUN pip install \
+    nbstripout \
+    jupyter-book \
+    ghp-import \
+    jupytext \
+    jupyter_nbextensions_configurator \
+    jupyter_contrib_nbextensions \
+    jupyterlab-spellchecker \
+    nbconvert \
+    pyppeteer \
+    jupyterlab-myst \
+    nbgitpuller \
+    jupyterlab_rise \
+    pyright \
+    python-lsp-server
+
+RUN mkdir /home/ope && \
+    cd /home/ope && \
+    git clone https://github.com/OPEFFORT/tools.git . && \
+    ./install.sh && \
+    fix-permissions /home/ope
+
+USER 1001

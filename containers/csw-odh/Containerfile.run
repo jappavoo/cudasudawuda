@@ -1,8 +1,0 @@
-# based on our analysis of https://github.com/opendatahub-io/notebooks/blob/main/jupyter/pytorch/ubi9-python-3.11/Dockerfile.cuda
-# we are choosing the associated published image found ont the opendatahub workbenches
-FROM quay.io/opendatahub/workbench-images:cuda-jupyter-minimal-ubi9-python-3.11-20250731
-USER root
-RUN dnf install -y \
-  cmake
-
-USER 1001

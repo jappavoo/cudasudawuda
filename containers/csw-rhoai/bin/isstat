@@ -1,1 +1,2 @@
 oc describe is/csw-dev-f25 -n redhat-ods-applications
+oc describe is/csw-run-f25 -n redhat-ods-applications
