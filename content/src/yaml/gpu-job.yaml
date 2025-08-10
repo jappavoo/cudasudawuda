@@ -1,19 +1,15 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: gpu-job
+  name: gpu-job-0
   labels:
-    kueue.x-k8s.io/queue-name: gpu-localqueue
+    kueue.x-k8s.io/queue-name: v100-localqueue
     test_name: kueue_test
 spec:
   parallelism: 1
   completions: 1
   template:
     spec:
-      tolerations:
-      - key: "nvidia.com/gpu.product"
-        operator: "Exists"
-        effect: "NoSchedule"
       restartPolicy: Never
       containers:
         - name: gpu-job-0

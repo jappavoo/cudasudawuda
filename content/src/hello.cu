@@ -9,7 +9,7 @@ helloFromGPU(void)
 int 
 main(void)
 {
-    printf("Hello form CPU\n");
+    printf("Hello from CPU\n");
     helloFromGPU <<< 1, 10 >>>();
     cudaDeviceSynchronize();
     cudaDeviceReset();
