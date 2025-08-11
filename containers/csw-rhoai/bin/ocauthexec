@@ -1,0 +1,19 @@
+#!/bin/bash
+
+oc create rolebinding default-edit --clusterrole=edit \
+  --serviceaccount=$(oc project -q):default
+
+oc create role default-edit-jobs \
+  --verb=get,list,watch,create,update,patch,delete \
+  --resource=jobs
+
+oc create rolebinding default-edit-jobs --role=default-edit-jobs \
+  --serviceaccount=$(oc project -q):default
+
+oc create role default-edit-pods-exec \
+  --verb=get,list,watch,create,update,patch,delete \
+  --resource=pods/exec
+
+oc create rolebinding default-edit-pods-exec --role=default-edit-pods-exec \
+  --serviceaccount=$(oc project -q):default
+  

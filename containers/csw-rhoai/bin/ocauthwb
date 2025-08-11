@@ -9,3 +9,4 @@ oc create role ${wb}-edit-jobs \
   --resource=jobs
 oc create rolebinding ${wb}-edit-jobs --role=${wb}-edit-jobs \
   --serviceaccount=$(oc project -q):${wb}
+
