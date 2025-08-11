@@ -10,6 +10,7 @@
 # based on our analysis of https://github.com/opendatahub-io/notebooks/blob/main/jupyter/pytorch/ubi9-python-3.11/Dockerfile.cuda
 # we are choosing the associated published image found ont the opendatahub workbenches
 FROM quay.io/modh/cuda-notebooks:cuda-jupyter-minimal-ubi9-python-3.11-20250808
+#FROM quay.io/modh/odh-pytorch-notebook:v3-20250808
 USER root
 
 # the following repo is already available from the base so we don't re add but here
@@ -49,7 +50,7 @@ RUN  wget https://ftp.gnu.org/pub/gnu/emacs/emacs-30.1.tar.gz && \
      { cd emacs-30.1; ./configure --without-x --with-gnutls=ifavailable; cd .. ; } && \
      make -C emacs-30.1 && \
      make -C emacs-30.1 install && \
-     rm -rf emacs-30.1 
+     rm -rf emacs-30.1* 
 
 RUN pip install \
     nbstripout \
@@ -66,6 +67,8 @@ RUN pip install \
     jupyterlab_rise \
     pyright \
     python-lsp-server
+    
+RUN pip install bash_kernel && python -m bash_kernel.install
 
 RUN mkdir /home/ope && \
     cd /home/ope && \
