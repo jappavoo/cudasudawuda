@@ -7,11 +7,12 @@
 #  https://quay.io/organization/modh
 #
 
-# based on our analysis of https://github.com/opendatahub-io/notebooks/blob/main/jupyter/pytorch/ubi9-python-3.11/Dockerfile.cuda
-# we are choosing the associated published image found ont the opendatahub workbenches
+# run container is based directly on the RHOAI image by passing the NERC
+# image as we don't need all our based development packages
 FROM quay.io/modh/cuda-notebooks:cuda-jupyter-minimal-ubi9-python-3.11-20250808
-USER root
 
+USER root
+# add cmake so that nvidia samples can be built
 RUN dnf install -y \
   cmake && \
   yum clean all \
