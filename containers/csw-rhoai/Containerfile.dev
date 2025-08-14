@@ -58,5 +58,6 @@ RUN mkdir /home/ope && \
     fix-permissions /home/ope
 
 # CUDA SUDA WUDA TOOLS
+RUN dnf -y install jq
 
 USER 1001
