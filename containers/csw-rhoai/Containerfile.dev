@@ -59,5 +59,12 @@ RUN mkdir /home/ope && \
 
 # CUDA SUDA WUDA TOOLS
 RUN dnf -y install jq
+RUN mkdir /home/csw && \
+    cd /home/csw && \
+    git clone https://github.com/jappavoo/batchtools.git && \
+    for f in /home/csw/batchtools/b*; do \
+       ln -s $f /usr/local/bin/$(basename $f); \
+    done; \ 
+    fix-permissions /home/csw 
 
 USER 1001
