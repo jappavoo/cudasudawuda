@@ -1,4 +1,121 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.0.6 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36" version="28.0.6" pages="5">
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.0.6 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36" version="28.0.6" pages="9">
+  <diagram name="S000" id="Y8vVQZQaktyFeXBuPMtU">
+    <mxGraphModel dx="1666" dy="1272" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1080" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="HgakdV4LqdoXQKoAhcys-0" />
+        <mxCell id="HgakdV4LqdoXQKoAhcys-1" value="Background" style="locked=1;" parent="HgakdV4LqdoXQKoAhcys-0" />
+        <mxCell id="HgakdV4LqdoXQKoAhcys-2" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=none;" vertex="1" parent="HgakdV4LqdoXQKoAhcys-1">
+          <mxGeometry width="1920" height="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="HgakdV4LqdoXQKoAhcys-3" value="Slide Content" parent="HgakdV4LqdoXQKoAhcys-0" />
+        <UserObject label="CS599: Programming Massively Parallel Processors &amp;amp; Hetrogenous Systems" tags="title" id="HgakdV4LqdoXQKoAhcys-4">
+          <mxCell style="text;html=1;align=left;verticalAlign=bottom;whiteSpace=wrap;rounded=0;fontSize=116;fontStyle=1;movable=0;aspect=fixed;resizable=0;rotatable=0;" vertex="1" parent="HgakdV4LqdoXQKoAhcys-3">
+            <mxGeometry x="95" y="203" width="1730" height="366" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;span style=&quot;font-size: 55px;&quot;&gt;Understanding and programming the devices powering AI&lt;/span&gt;" tags="subtitle" id="HgakdV4LqdoXQKoAhcys-5">
+          <mxCell style="text;strokeColor=none;align=left;fillColor=none;html=1;verticalAlign=top;whiteSpace=wrap;rounded=0;fontStyle=1;movable=0;resizable=0;rotatable=0;" vertex="1" parent="HgakdV4LqdoXQKoAhcys-3">
+            <mxGeometry x="95" y="569" width="1730" height="150" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Jonathan Appavoo&amp;nbsp; &amp;nbsp; &amp;nbsp; email: jappavoo @ b u . e d u&amp;nbsp; office: CDS 706&amp;nbsp;" tags="author" id="HgakdV4LqdoXQKoAhcys-6">
+          <mxCell style="text;strokeColor=none;align=left;fillColor=none;html=1;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=36;fontStyle=1;movable=0;resizable=0;rotatable=0;" vertex="1" parent="HgakdV4LqdoXQKoAhcys-3">
+            <mxGeometry x="95" y="934" width="1730" height="50" as="geometry" />
+          </mxCell>
+        </UserObject>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="S001" id="1CjG8qhs0Oho3-TpYxSA">
+    <mxGraphModel dx="1960" dy="1496" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1080" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="XfvI9MYCOvy80W41dMfE-0" />
+        <mxCell id="XfvI9MYCOvy80W41dMfE-1" value="Background" style="locked=1;" parent="XfvI9MYCOvy80W41dMfE-0" />
+        <mxCell id="XfvI9MYCOvy80W41dMfE-2" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=none;" vertex="1" parent="XfvI9MYCOvy80W41dMfE-1">
+          <mxGeometry width="1920" height="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="XfvI9MYCOvy80W41dMfE-3" value="Slide Content" parent="XfvI9MYCOvy80W41dMfE-0" />
+        <UserObject label="CS599: Programming Massively Parallel Processors &amp;amp; Hetrogenous Systems" tags="title" id="XfvI9MYCOvy80W41dMfE-4">
+          <mxCell style="text;html=1;align=left;verticalAlign=bottom;whiteSpace=wrap;rounded=0;fontSize=116;fontStyle=1;movable=0;aspect=fixed;resizable=0;rotatable=0;" vertex="1" parent="XfvI9MYCOvy80W41dMfE-3">
+            <mxGeometry x="95" y="203" width="1730" height="366" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;span style=&quot;font-size: 55px;&quot;&gt;Understanding and programming the devices powering AI&lt;/span&gt;" tags="subtitle" id="XfvI9MYCOvy80W41dMfE-5">
+          <mxCell style="text;strokeColor=none;align=left;fillColor=none;html=1;verticalAlign=top;whiteSpace=wrap;rounded=0;fontStyle=1;movable=0;resizable=0;rotatable=0;" vertex="1" parent="XfvI9MYCOvy80W41dMfE-3">
+            <mxGeometry x="95" y="569" width="1730" height="150" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Jonathan Appavoo&amp;nbsp; &amp;nbsp; &amp;nbsp; email: jappavoo @ b u . e d u&amp;nbsp; office: CDS 706&amp;nbsp;" tags="author" id="XfvI9MYCOvy80W41dMfE-6">
+          <mxCell style="text;strokeColor=none;align=left;fillColor=none;html=1;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=36;fontStyle=1;movable=0;resizable=0;rotatable=0;" vertex="1" parent="XfvI9MYCOvy80W41dMfE-3">
+            <mxGeometry x="95" y="934" width="1730" height="50" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="deglsV7pcrlQwJOa7SmE-4" value="" style="rounded=0;whiteSpace=wrap;html=1;rotation=30;fillColor=light-dark(#FF3333,#FF3333);opacity=80;" vertex="1" parent="XfvI9MYCOvy80W41dMfE-3">
+          <mxGeometry x="154" y="337" width="1187.87" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="deglsV7pcrlQwJOa7SmE-5" value="" style="rounded=0;whiteSpace=wrap;html=1;rotation=-30;fillColor=light-dark(#FF3333,#FF3333);opacity=80;" vertex="1" parent="XfvI9MYCOvy80W41dMfE-3">
+          <mxGeometry x="164" y="347" width="1187.87" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="deglsV7pcrlQwJOa7SmE-6" value="CUDA Programming on GPU&#39;s" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FF3333;fontSize=64;fontStyle=1;rotation=-5;" vertex="1" parent="XfvI9MYCOvy80W41dMfE-3">
+          <mxGeometry x="231" y="731" width="1116" height="103" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="S002" id="txDLtSQC8P2oJJOYbPG9">
+    <mxGraphModel dx="1666" dy="1272" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1080" math="0" shadow="0">
+      <root>
+        <mxCell id="1XeRjz82fjQmfAEml_mx-0" />
+        <mxCell id="1XeRjz82fjQmfAEml_mx-1" value="Background" style="locked=1;" parent="1XeRjz82fjQmfAEml_mx-0" />
+        <mxCell id="1XeRjz82fjQmfAEml_mx-2" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=none;" vertex="1" parent="1XeRjz82fjQmfAEml_mx-1">
+          <mxGeometry width="1920" height="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="1XeRjz82fjQmfAEml_mx-3" value="Slide Content" parent="1XeRjz82fjQmfAEml_mx-0" />
+        <UserObject label="CS599" tags="title" id="1XeRjz82fjQmfAEml_mx-4">
+          <mxCell style="text;strokeColor=none;align=left;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=116;fontStyle=1;movable=0;resizable=0;rotatable=0;rotation=0;" vertex="1" parent="1XeRjz82fjQmfAEml_mx-3">
+            <mxGeometry x="95" y="375" width="1730" height="336" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Course Synopsis&lt;div&gt;(See Syllabus Piazza for details)&lt;/div&gt;" tags="subtitle" id="1XeRjz82fjQmfAEml_mx-5">
+          <mxCell style="text;strokeColor=none;align=left;fillColor=none;html=1;verticalAlign=top;rounded=0;fontSize=55;fontStyle=1;movable=1;resizable=1;rotatable=0;" vertex="1" parent="1XeRjz82fjQmfAEml_mx-3">
+            <mxGeometry x="95" y="754" width="1730" height="244" as="geometry" />
+          </mxCell>
+        </UserObject>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="S003" id="uz4n_gX6e4p9Xhn4rpp9">
+    <mxGraphModel dx="1666" dy="1272" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1080" math="0" shadow="0">
+      <root>
+        <mxCell id="owH3YeLE49idvKbtHqod-0" />
+        <mxCell id="owH3YeLE49idvKbtHqod-1" value="Background" style="locked=1;" parent="owH3YeLE49idvKbtHqod-0" />
+        <mxCell id="owH3YeLE49idvKbtHqod-2" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=none;" vertex="1" parent="owH3YeLE49idvKbtHqod-1">
+          <mxGeometry width="1920" height="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="owH3YeLE49idvKbtHqod-3" value="Slide Content" parent="owH3YeLE49idvKbtHqod-0" />
+        <UserObject label="Course Prerequisites and Structure" tags="title" id="owH3YeLE49idvKbtHqod-4">
+          <mxCell style="text;strokeColor=none;align=left;fillColor=none;html=1;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=85;fontStyle=1;movable=0;resizable=0;rotatable=0;" vertex="1" parent="owH3YeLE49idvKbtHqod-3">
+            <mxGeometry x="95" y="85" width="1730" height="113" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="See Syllabus for D" tags="subtitle" id="owH3YeLE49idvKbtHqod-5">
+          <mxCell style="text;strokeColor=none;align=left;fillColor=none;html=1;verticalAlign=top;rounded=0;fontSize=55;fontStyle=1;movable=0;resizable=0;rotatable=0;" vertex="1" parent="owH3YeLE49idvKbtHqod-3">
+            <mxGeometry x="95" y="187" width="1730" height="74" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;ul&gt;&lt;li&gt;Body Level One&lt;/li&gt;&lt;ul&gt;&lt;li&gt;Body Level Two&lt;/li&gt;&lt;ul&gt;&lt;li&gt;Body Level There&lt;/li&gt;&lt;ul&gt;&lt;li&gt;Body Level Four&lt;/li&gt;&lt;ul&gt;&lt;li&gt;Body Level Five&lt;/li&gt;&lt;/ul&gt;&lt;/ul&gt;&lt;/ul&gt;&lt;/ul&gt;&lt;/ul&gt;" tags="body" id="owH3YeLE49idvKbtHqod-6">
+          <mxCell style="text;strokeColor=none;align=left;fillColor=none;html=1;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=48;movable=0;resizable=0;rotatable=0;" vertex="1" parent="owH3YeLE49idvKbtHqod-3">
+            <mxGeometry x="95" y="299" width="1730" height="650" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Footer" tags="footer" id="owH3YeLE49idvKbtHqod-7">
+          <mxCell style="text;strokeColor=none;align=left;fillColor=none;html=1;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=55;fontStyle=1;movable=0;resizable=0;" vertex="1" parent="owH3YeLE49idvKbtHqod-3">
+            <mxGeometry x="95" y="989" width="1730" height="74" as="geometry" />
+          </mxCell>
+        </UserObject>
+      </root>
+    </mxGraphModel>
+  </diagram>
   <diagram name="Title" id="tndA3juTFIhTGiaQsKCo">
     <mxGraphModel dx="2457" dy="1845" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1080" background="#ffffff" math="0" shadow="0">
       <root>
