@@ -1,0 +1,1 @@
+docker build -f Dockerfile.dev -t quay.io/jappavoo/csw-dev-arm64:local .

@@ -1,0 +1,89 @@
+# Ultimately to be consistent with the Red Hat Open AI (RHOAI) environment
+# (and attendant HW) that is avaiable to us in the NERC MOC we base our
+# images on the RHOAI provided images.  The src for these are maintained
+# here:
+#  https://github.com/red-hat-data-services/notebooks
+# the images are published here:
+#  https://quay.io/organization/modh
+#
+
+# The image we have choosen is
+#  quay.io/modh/cuda-notebooks:cuda-jupyter-minimal-ubi9-python-3.11-20250808
+
+# NERC maintains a drived based image that added various packages we need for
+# our development environment see distro packages below
+# src: https://github.com/nerc-images/csw-base-cuda-minimal
+# img: quay.io/nerc-images/csw-base-cuda-minimal:latest
+#FROM quay.io/nerc-images/csw-base-cuda-minimal:latest
+FROM  quay.io/jupyter/minimal-notebook:2025-08-15
+
+USER root
+
+# CUDA
+# the following repo is already available from the base so we don't re add but here
+# for documentation purposes
+# as per https://docs.nvidia.com/cuda/cuda-installation-guide-linux/#network-repo-installation-for-fedora
+# we do this so that additional repositories are available even non-NVIDIA ones
+
+# DISTRO PACKAGES
+#  nerc minimal has all the based distro packages we need see
+#    https://github.com/nerc-images/csw-base-cuda-minimal/blob/main/Containerfile
+# cmake, emacs, bc, man-pages
+
+RUN apt-get -y update --fix-missing && \
+    apt-get -y install jq emacs cmake && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# PYTHON PACKAGES
+#  python stuff for ope compatability
+RUN pip install \
+    nbstripout \
+    jupyter-book \
+    ghp-import \
+    jupytext \
+    jupyter_nbextensions_configurator \
+    jupyter_contrib_nbextensions \
+    jupyterlab-spellchecker \
+    nbconvert \
+    pyppeteer \
+    jupyterlab-myst \
+    nbgitpuller \
+    jupyterlab_rise \
+    pyright \
+    python-lsp-server
+
+# bash kernel to make it easier bash based juypter notebooks
+RUN pip install bash_kernel && python -m bash_kernel.install
+
+# install drawio
+RUN wget https://github.com/jgraph/drawio-desktop/releases/download/v28.0.6/drawio-amd64-28.0.6.deb && \
+    apt get install ./drawio-amd64-28.0.6.deb && \
+    rm ./drawio-amd64-28.0.6.deb && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+    
+# OPE TOOLS
+RUN mkdir /home/ope && \
+    cd /home/ope && \
+    git clone https://github.com/OPEFFORT/tools.git . && \
+    for f in /home/ope/bin/*; do \
+       ln -s $f /usr/local/bin/$(basename $f); \
+    done; \ 
+    fix-permissions /home/ope
+
+# Drawio JupyerLab RISE presentation template tools
+RUN mkdir /home/prestemplate && \
+    cd /home/prestemplate && \
+    git clone https://github.com/jappavoo/prestemplate.git . && \
+    ln -s /home/prestemplate/mkpres /usr/local/bin/mkpres && \
+    fix-permissions /home/prestemplate
+
+# CUDA SUDA WUDA TOOLS
+RUN mkdir /home/csw && \
+    cd /home/csw && \
+    git clone https://github.com/jappavoo/batchtools.git && \
+    for f in /home/csw/batchtools/b*; do \
+       ln -s $f /usr/local/bin/$(basename $f); \
+    done; \ 
+    fix-permissions /home/csw 
+
+USER $NB_USER
