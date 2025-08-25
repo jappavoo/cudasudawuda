@@ -27,7 +27,7 @@ USER root
 # DISTRO PACKAGES
 #  nerc minimal has all the based distro packages we need see
 #    https://github.com/nerc-images/csw-base-cuda-minimal/blob/main/Containerfile
-# cmake, emacs, bc, man-pages
+# cmake, emacs, bc, jq, texlive, man-pages 
 
 # PYTHON PACKAGES
 #  python stuff for ope compatability
@@ -50,6 +50,9 @@ RUN pip install \
 # bash kernel to make it easier bash based juypter notebooks
 RUN pip install bash_kernel && python -m bash_kernel.install
 
+# as per the nbstripout readme we setup nbstripout be always be used for the joyvan user for all repos
+RUN nbstripout --install --system 
+
 # OPE TOOLS
 RUN mkdir /home/ope && \
     cd /home/ope && \
@@ -58,7 +61,6 @@ RUN mkdir /home/ope && \
     fix-permissions /home/ope
 
 # CUDA SUDA WUDA TOOLS
-RUN dnf -y install jq
 RUN mkdir /home/csw && \
     cd /home/csw && \
     git clone https://github.com/jappavoo/batchtools.git && \
