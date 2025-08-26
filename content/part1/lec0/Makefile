@@ -5,7 +5,7 @@ IMGDIRS = $(patsubst %.drawio,%.imgs,$(SRCS))
 
 .PHONY: all clean
 
-%.ipynb: %.drawio
+%.ipynb: %.drawio nb.json
 	./diox $< $*.imgs
 	$(PYTHON) ./mknb.py $*.imgs -o $@
 

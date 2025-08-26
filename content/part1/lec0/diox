@@ -15,6 +15,8 @@ DIOBORDER=${DIOBORDER:-0}
 # scale ??? 6 = 600dpi?
 DIOSCALE=${DIOSCALE:-1}
 DIOWIDTH=${DIOWIDTH:-1920}
+# REMOVE TEMPLATE SLIDES
+removecnt=${TSLIDECNT:-5}
 
 function usage()
 {
@@ -66,11 +68,15 @@ if [[ $DIOPAGE = 0 ]]; then
     $DIO --export --format xml --uncompressed -o /tmp/$$_$input.xml "$input" 2> /dev/null
     # Count how many pages based on <diagram element
     count=$(grep -o '<diagram' /tmp/$$_$input.xml | wc -l)
+    if ((count > removecnt)); then
+	(( count=count-removecnt ))
+    fi
     pages=$(seq 1 $(($count)) )
     rm /tmp/$$_$input.xml
 fi
 
 echo $pages
+
 for page in $pages; do
     ofile=$(printf "$output/%03d.$DIOFORMAT" $page)
     (( VERBOSE )) && {
