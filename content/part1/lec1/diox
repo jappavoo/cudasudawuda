@@ -1,0 +1,86 @@
+#!/bin/bash
+#set -x
+
+# this script was developed based on posts found on the internet
+typeset -i VERBOSE=${VERBOSE:-0}
+
+#default export to png
+DIOFORMAT=${DIOFORMAT:-png}
+#default do not make background transparent : set to -t to make transparent
+DIOTRANSPARENT=${DIOTRANSPARENT:-}
+#page to export defaults to all pages (0)
+DIOPAGE=${DIOPAGE:-0}
+#default border width
+DIOBORDER=${DIOBORDER:-0}
+# scale ??? 6 = 600dpi?
+DIOSCALE=${DIOSCALE:-1}
+DIOWIDTH=${DIOWIDTH:-1920}
+# REMOVE TEMPLATE SLIDES
+removecnt=${TSLIDECNT:-5}
+
+function usage()
+{
+    echo "USAGE diox <input drawio file> [output directory for pages]" > /dev/stderr
+}
+
+DIO=$(type -p draw.io)
+[[ -z $DIO &&  -x "/Applications/draw.io.app/Contents/MacOS/draw.io" ]] && DIO="/Applications/draw.io.app/Contents/MacOS/draw.io"
+
+if [[ -z $DIO ]]; then
+   echo "ERROR: failed to find draw.io executable"
+   exit -1
+fi
+
+input=$1
+output=$2
+
+[[ -z $input ]] && {
+    usage
+    exit 0
+}
+
+[[ ! -a $input ]] && {
+    echo "ERROR: $input does not exist" > /dev/stderr
+    usage
+    exit -1
+}
+
+[[ -z $output ]] && {
+    output=${input%.*}
+}
+
+[[ $input == $output ]] && {
+    echo "ERROR: $input: input and output cannot be the same" > /dev/stderr
+    usage
+    exit -1
+}
+
+[[ ! -d $output ]] && {
+    ! mkdir $output && {
+	echo "ERROR: failed to create $output" > /dev/stderr
+	usage
+	exit -1
+    }
+}
+
+if [[ $DIOPAGE = 0 ]]; then
+    # Export diagram to plain XML
+    $DIO --export --format xml --uncompressed -o /tmp/$$_$input.xml "$input" 2> /dev/null
+    # Count how many pages based on <diagram element
+    count=$(grep -o '<diagram' /tmp/$$_$input.xml | wc -l)
+    if ((count > removecnt)); then
+	(( count=count-removecnt ))
+    fi
+    pages=$(seq 1 $(($count)) )
+    rm /tmp/$$_$input.xml
+fi
+
+echo $pages
+
+for page in $pages; do
+    ofile=$(printf "$output/%03d.$DIOFORMAT" $page)
+    (( VERBOSE )) && {
+	echo "$DIO -x  -f $DIOFORMAT $DIOTRANSPARENT -b $DIOBORDER -s $DIOSCALE --width ${DIOWIDTH} -p $page $input -o $ofile"
+    }
+    $DIO -x  -f $DIOFORMAT $DIOTRANSPARENT -b $DIOBORDER -s $DIOSCALE --width ${DIOWIDTH} -p $page $input -o $ofile 2>/dev/null
+done
