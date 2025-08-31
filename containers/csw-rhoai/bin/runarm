@@ -1,0 +1,5 @@
+#!/bin/bash
+DIR=${DIR:-~/Work}
+MPT=${MPT:-/home/jovyan/work}
+
+docker run --rm -p 8888:8888 -v ~/Work:/home/jovyan/work   quay.io/jappavoo/csw-dev-arm64:local
