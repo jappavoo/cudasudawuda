@@ -1,0 +1,119 @@
+Certainly! Here’s an **accompanying explanation** for the table, suitable for readers who want to verify and understand the data, including units, methodology, and sources.
+
+---
+
+## **Table Explanation and Sources**
+
+### **Overview**
+This table compares key hardware specifications and theoretical peak performance figures for high-end Nvidia server GPUs and contemporaneous Intel Xeon CPUs from 2016 to 2024. Specs are shown for representative flagship models released in similar years.
+
+---
+
+### **Column Definitions**
+Each column represents a single processor or GPU SKU at launch:
+
+- **Nvidia P100, V100, A100, H100, B100:**  
+  Nvidia’s highest-end server GPUs for respective years (SXM module where available).
+- **Intel E7-8894 v4, Platinum 8180, Platinum 9282, Platinum 8490H, Max 6700/8500:**  
+  Intel’s highest-core-count Xeon CPUs for each era.
+
+---
+
+### **Row Breakdown**
+
+#### **Cores**
+- **GPUs:** Number of CUDA cores (fundamental GPU processing elements).
+- **CPUs:** Number of physical processing cores.
+- **Source:** Nvidia and Intel official product pages.
+
+#### **Threads**
+- **GPUs:** Not applicable (-) as GPUs use a different model of thread distribution.
+- **CPUs:** Number of hardware threads (cores × 2 for CPUs with Hyper-Threading).
+- **Source:** Intel ARK database.
+
+#### **Peak INT32 TIPS**
+- **Definition:** Theoretical peak trillion integer-32 operations per second.
+- **GPUs:** Nvidia’s published theoretical peak INT32 throughput, which for most architectures is similar to FP32 throughput.
+- **CPUs:** Calculated as  
+  *cores × base clock (GHz) × integer SIMD width (number of INT32 ops/cycle per core)*.  
+  For CPUs with AVX-512, this is up to 32 INT32 ops/cycle/core; for AVX2, up to 8.
+- **Sources:**  
+  - Nvidia whitepapers (for GPUs)
+  - Intel architecture manuals, ARK, and [Official SIMD instruction set documentation](https://www.intel.com/content/www/us/en/developer/tools/oneapi/avx-512-programming-reference.html) (for CPUs)
+
+#### **Peak FP32 TFLOPS / Peak FP64 TFLOPS**
+- **Definition:** Theoretical peak trillion floating-point operations per second, single (FP32) and double precision (FP64).
+- **GPUs:** Vendor-published maximums, based on internal architecture specs.
+- **CPUs:** Calculated similarly to INT32 TIPS, using FMA width for floating point.
+- **Sources:**  
+  - Nvidia product documentation
+  - Intel ARK and official whitepapers
+
+#### **Memory Bandwidth (GB/s)**
+- **Definition:** The maximum theoretical memory bandwidth per device.
+- **GPUs:** HBM/HBM2/HBM3 memory controller specs, converted to GB/s.
+- **CPUs:** Theoretical bandwidth for 6- or 8-channel DDR4/DDR5 at rated speeds, per socket.
+- **Sources:**  
+  - Nvidia datasheets  
+  - Intel ARK specifications
+
+#### **Approx. Cost (MSRP, USD)**
+- **Definition:** Approximate manufacturer suggested retail price (MSRP) in US dollars for the device at launch; not current market prices or used prices.
+- **GPUs:** Typical MSRP or confirmed large enterprise sales price for SXM modules.
+- **CPUs:** MSRP for boxed server processor or reported per-unit cost.
+- **Sources:**  
+  - Nvidia price guidance ([Nvidia Data Center GPUs](https://www.nvidia.com/en-us/data-center/))
+  - Intel ARK, historical pricing reports, reseller catalogues.
+  - Industry coverage inc. [Tom’s Hardware](https://www.tomshardware.com/), [ServeTheHome](https://www.servethehome.com/)
+
+#### **Peak Power (W)**
+- **Definition:** Thermal design power (TDP) in watts (W) per processor or GPU module.
+- **GPUs:** TDP for SXM/server versions at launch; PCIe versions often lower.
+- **CPUs:** Maximum TDP spec from Intel.
+- **Sources:**  
+  - Nvidia GPU datasheets
+  - Intel ARK and SKU documentation
+
+---
+
+### **How to Verify Values**
+
+To verify individual values, consult the following official or primary sources:
+
+- **Nvidia GPUs:**  
+  - [Nvidia Data Center GPU Product Pages](https://www.nvidia.com/en-us/data-center/)
+  - [Nvidia Architecture Whitepapers](https://developer.nvidia.com/)
+  - [HPC benchmarks and documentation](https://www.top500.org/lists/top500/)
+
+- **Intel CPUs:**  
+  - [Intel ARK Database](https://ark.intel.com/)
+  - [SPEC Benchmark Results](https://www.spec.org/cpu2017/results/)
+  - Processor datasheets and technical documentation
+
+- **General Hardware Review Sites:**  
+  - [Tom’s Hardware](https://www.tomshardware.com/)
+  - [ServeTheHome](https://www.servethehome.com/)
+  - [AnandTech](https://www.anandtech.com/)
+  - [HPCWire](https://www.hpcwire.com/)
+
+**Calculations of Peak INT32/FP32/FP64:**  
+For CPUs, multiply the number of cores by the base clock frequency and the number of operations that can be performed per cycle (use AVX-512 or AVX2 width where available).  
+For GPUs, use the vendor-published theoretical peak figures.
+
+---
+
+### **Units**
+
+- **Cores:** Integer count (no units)
+- **Threads:** Integer count (no units)
+- **TIPS (Trillion INT32 Operations Per Second):** Trillions of integer 32-bit operations per second
+- **TFLOPS (Trillion Floating Point Operations Per Second):** Trillions of floating point operations per second
+- **Memory Bandwidth (GB/s):** Gigabytes per second of memory read/write throughput
+- **Approx. Cost (MSRP, USD):** US dollars (USD), estimated retail price at launch
+- **Peak Power (W):** Watts (W), maximum rated thermal design power
+
+---
+
+**If you need formulas, direct links to technical specs, or deeper notes on any value, let me know!**
+
+
