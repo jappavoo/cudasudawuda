@@ -1,0 +1,19 @@
+{
+    "kernelspec": {
+        "name": "bash",
+        "display_name": "Bash",
+        "language": "bash"
+    },
+    "language_info": {
+        "name": "bash",
+        "codemirror_mode": "shell",
+        "mimetype": "text/x-sh",
+        "file_extension": ".sh"
+    },
+    "rise": {
+        "enable_chalkboard": true,
+        "scroll": false,
+        "start_slideshow_at": "selected",
+        "transition": "none"
+    }
+}
