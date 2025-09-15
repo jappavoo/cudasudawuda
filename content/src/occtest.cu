@@ -9,6 +9,7 @@
 #define NYI { fprintf(stderr, "%s: %d: NYI\n", __func__, __LINE__); assert(0); }
 #define CLOCK_SOURCE CLOCK_MONOTONIC
 #define NSEC_IN_SECOND (1000000000)
+#define TERA_OPS (1000000000000)
 
 typedef struct timespec ts_t;
 
@@ -47,7 +48,7 @@ dumpGPUProps(int dev)
 
 #define FOPSPERLOOP 2
 __global__ void kernel(int n) {
-  volatile float v = 0.0f;
+  volatile float v1 = 0.0f;
   volatile int i;
 
   // pragma is need to trick optimizer
@@ -56,14 +57,14 @@ __global__ void kernel(int n) {
     // based on my guess of the sass code that was produced for compute capacity 7.0
     // I think there is a benefit to having a integer and floating point instruction dual
     // issue ... this is a complete guess
-    asm volatile ("add.f32 %0, %0, 1.0;" : "+f"(v));
-    asm volatile ("add.f32 %0, %0, 1.0;" : "+f"(v));
+    asm volatile ("add.f32 %0, %0, 1.0;" : "+f"(v1));
+    asm volatile ("add.f32 %0, %0, 1.0;" : "+f"(v1));
   }
 
   // next line is to try and trick optimizer
   // having a dependency on v we hope to avoid it from removing the body
   // of the above for loop
-  if (v) { asm volatile ("mov.s32 %0, %%clock;" : "=r"(i)); }
+  if (v1) { asm volatile ("mov.s32 %0, %%clock;" : "=r"(i)); }
 }
 
 bool GPUcnt()
@@ -78,6 +79,7 @@ bool GPUcnt()
 
 int main(int argc, char **argv)
 {
+  cudaError_t rc;
   int n, blks, thdsPerBlk, smemPerBlk;
   ts_t start, end;
 
@@ -100,9 +102,23 @@ int main(int argc, char **argv)
   assert(ts_now(&start));
 
   kernel<<<blks, thdsPerBlk, smemPerBlk>>>(n);
+  rc = cudaGetLastError();
+  if (rc != cudaSuccess) {
+    // Handle the error, e.g., print error message and exit
+    fprintf(stderr, "CUDA kernel launch failed: %s\n", cudaGetErrorString(rc));
+    exit(EXIT_FAILURE);
+  }
   cudaDeviceSynchronize();
-
   assert(ts_now(&end));
+  
+  rc = cudaGetLastError();
+  if (rc != cudaSuccess) {
+    // Handle the error, e.g., print error message and exit
+    fprintf(stderr, "CUDA kernel launch failed: %s\n", cudaGetErrorString(rc));
+    exit(EXIT_FAILURE);
+  }
+
+  
   cudaDeviceReset();
 
   {
@@ -110,7 +126,7 @@ int main(int argc, char **argv)
     uint64_t ns=ts_diff(start,end);
     double   sec=(double)ns/(double)NSEC_IN_SECOND;
     double   flops=(double)numFOps/sec;
-    printf("%lu,%lu,%lf,%lf\n", numFOps, ns, sec, flops);
+    printf("%lu,%lu,%lf,%lf,%lf\n", numFOps, ns, sec, flops,flops/TERA_OPS);
   }
   
   return EXIT_SUCCESS;
