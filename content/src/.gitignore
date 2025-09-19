@@ -1,3 +1,14 @@
 gpuinfo
 hello
 jobs
+tid
+transpose
+occtest
+matadd
+*.compute*
+*.cpp4*
+fade
+*.fatbin*
+*_dlink*
+*.o
+*.module*

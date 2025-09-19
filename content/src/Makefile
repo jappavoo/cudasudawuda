@@ -2,7 +2,7 @@ CFLAGS += -gencode arch=compute_70,code=sm_70
 CFLAGS += -gencode arch=compute_80,code=sm_80
 CFLAGS += -gencode arch=compute_90,code=sm_90
 CFLAGS += --ptxas-options=-v
-TARGETS = hello gpuinfo tid fade occtest matadd
+TARGETS = hello gpuinfo tid fade matadd transpose
 
 all: ${TARGETS}
 
@@ -22,6 +22,9 @@ fade: fade.cu
 	nvcc  $(CFLAGS) $< -o $@
 
 matadd: matadd.cu
+	nvcc $(CFLAGS) $< -o $@
+
+transpose: transpose.cu
 	nvcc $(CFLAGS) $< -o $@
 
 occtest: occtest.cu
