@@ -5,6 +5,7 @@ tid
 transpose
 occtest
 matadd
+reduce
 *.compute*
 *.cpp4*
 fade

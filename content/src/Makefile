@@ -2,7 +2,7 @@ CFLAGS += -gencode arch=compute_70,code=sm_70
 CFLAGS += -gencode arch=compute_80,code=sm_80
 CFLAGS += -gencode arch=compute_90,code=sm_90
 CFLAGS += --ptxas-options=-v
-TARGETS = hello gpuinfo tid fade matadd transpose
+TARGETS = hello gpuinfo tid fade matadd transpose reduce occtest
 
 all: ${TARGETS}
 
@@ -32,6 +32,9 @@ occtest: occtest.cu
 
 occtest.cubin: occtest.cu
 	nvcc --cubin -gencode arch=compute_70,code=sm_70  $< -o $@
+
+reduce: reduce.cu
+	nvcc  $(CFLAGS)  $< -o $@
 
 clean:
 	-${RM} -rf $(wildcard ${TARGETS} *.o *.cubin *.ptx *.cudafe* *.ii *.fatbin* *.reg* *.module_id *.sass jobs)
