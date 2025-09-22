@@ -6,7 +6,7 @@
 #include <stdbool.h>
 
 // uncomment to see debug prints from first thread in everny block
-// #define BDEBUG
+//#define BDEBUG
 
 #ifdef BDEBUG
 #define BPRINT(fmt, ...) if (threadIdx.x == 0) {			\
@@ -26,9 +26,7 @@
 #define KILOBYTE (1024ULL)
 typedef struct timespec ts_t;
 
-static inline int
-ts_now(ts_t *now)
-{
+static inline int ts_now(ts_t *now) {
   if (clock_gettime(CLOCK_SOURCE, now) == -1) {
     perror("clock_gettime");
     NYI;
@@ -37,10 +35,9 @@ ts_now(ts_t *now)
   return 1;
 }
 
-static inline uint64_t
-ts_diff(ts_t start, ts_t end)
-{
-  uint64_t diff=((end.tv_sec - start.tv_sec)*NSEC_IN_SECOND) + (end.tv_nsec - start.tv_nsec);
+static inline uint64_t ts_diff(ts_t start, ts_t end) {
+  uint64_t diff=((end.tv_sec - start.tv_sec)*NSEC_IN_SECOND) +
+    (end.tv_nsec - start.tv_nsec);
   return diff;
 } 
 
@@ -50,9 +47,7 @@ void getGPUProps(int dev, cudaDeviceProp *deviceProp) {
   assert(rc == cudaSuccess);
 }
 
-void
-dumpGPUProps(int dev, cudaDeviceProp *devProp)
-{
+void dumpGPUProps(int dev, cudaDeviceProp *devProp) {
   printf("  Device %d: %s\n", dev, devProp->name);
   printf("    Compute Capability: %d.%d\n", devProp->major, devProp->minor);
   printf("    Total Global Memory: %.2f GB\n",
@@ -64,9 +59,7 @@ dumpGPUProps(int dev, cudaDeviceProp *devProp)
   printf("    #Threads per Warp: %d\n", devProp->warpSize);
 }
 
-
-bool GPUcnt()
-{
+bool GPUcnt() {
   cudaError_t rc;
   int cnt;
   
@@ -75,9 +68,7 @@ bool GPUcnt()
   return 0;
 }
 
-void
-h_sum(float *result, float *vec, uint64_t n)
-{
+void h_sum(float *result, float *vec, uint64_t n) {
   float sum;
   uint64_t i;
 
@@ -95,55 +86,43 @@ void initData(float *data, uint64_t n) {
   data[n-1]=43.0;   // one value that cause final sum to 0 
 }
 
+#define CONCAT_EXPAND(a, b) a##b
+#define CONCAT(a, b) CONCAT_EXPAND(a, b)
 
-__global__ void reduce1(float *d_ivec, float *d_ovec) {
-  extern __shared__ float sdata[];
+#define STRINGIFY_EXPAND(x) #x
+#define STRINGIFY(x) STRINGIFY_EXPAND(x)
 
-  unsigned int tid = threadIdx.x;
-  unsigned int i   = blockIdx.x * blockDim.x + threadIdx.x;
+#define REDUCE_KERNEL(n) CONCAT(reduce, n)
+#define REDUCE_KERNEL_STR(n) STRINGIFY(CONCAT(reduce, n))
 
-  BPRINT("%d.%d xdim=%d sdata:%p d_ivec=%p d_ovec=%p\n", blockIdx.x, tid,
-	 blockDim.x, sdata, d_ivec, d_ovec);
+#include "reduce1.cu"
 
-  // all threads used to copy a data item from global memory to shared memory
-  sdata[tid]       = d_ivec[i];
-  __syncthreads();
-
-  BPRINT("%d.%d sdata coppied\n",blockIdx.x, tid);
-  // all data for this block is in shared memory now
-  // we will now do log2 passes with strides doubling each time
-  for (unsigned int s=1; s<blockDim.x; s *= 2) {
-    // for this stride a stride workers are threads with tids divisible by
-    // (2 * stride). Each stride work thread sums its element and  element
-    // that is s elements away from it 
-    if ( (tid % (2*s)) == 0 ) {
-      BPRINT("s:%d sdata[%d]=sdata[%d]\n", s, tid, tid+s);
-      sdata[tid] += sdata[tid+s];
-    }
-    __syncthreads();    // barrier here to make sure all sums are done
-  }
-
-  BPRINT("%d.%d sdata computed\n", blockIdx.x, tid);
-
-  if (tid==0) d_ovec[blockIdx.x] = sdata[0];
-}
 
 int main(int argc, char **argv) {
   uint64_t  bytes = 4 * GIGABYTE;
-  int       n,  numFOps, numGPUS, cpuflg=0;
-  ts_t      start, end;
+  int       blksize=256, numtrials=30;		
+  int       n, numFOps, numGPUS, cpuflg=0;
+  ts_t      hstart, hend, dstart, dend;
   float     result, *h_vec;
-
+  uint64_t  ns, minns, readbytes, writtenbytes, totalbytes;
+  double    sec, minsec, bytespersec, minbytespersec, gbpersec, mingbpersec,
+            flops, minflops;
+  
+  
   if (argc>1) {
     if (strncmp(argv[1], "-c", 2)==0) {
       cpuflg = 1;
     } else {
-      bytes=atoi(argv[1]) * GIGABYTE;
+      blksize = atoi(argv[1]);
+    }
+    if (argc>2) {
+      bytes = atoi(argv[2]);
     }
   }
-
+  
   n       = bytes/(sizeof(float));
-  fprintf(stderr, "reduce: bytes=%lu n=%d\n", bytes, n);
+  fprintf(stderr, REDUCE_KERNEL_STR(KNUM) ": bytes=%lu n=%d blksize=%d\n", bytes,
+	  n, blksize);
   
   numFOps = n;                     // one floating point operation per element
   assert(n*sizeof(float)==bytes);
@@ -153,12 +132,12 @@ int main(int argc, char **argv) {
   initData(h_vec,n);
 
   if (cpuflg) {
-    assert(ts_now(&start));    
+    assert(ts_now(&hstart));    
     h_sum(&result, h_vec, n);
-    assert(ts_now(&end));
-    uint64_t ns=ts_diff(start,end);
-    double   sec=(double)ns/(double)NSEC_IN_SECOND;
-    double   flops=(double)numFOps/sec;
+    assert(ts_now(&hend));
+    ns=ts_diff(hstart,hend);
+    sec=(double)ns/(double)NSEC_IN_SECOND;
+    flops=(double)numFOps/sec;
     printf("host: %f,%lu,%lu,%lf,%lf,%lf\n", result, numFOps, ns, sec,
 	   flops,flops/TERA_OPS);
   }
@@ -171,68 +150,107 @@ int main(int argc, char **argv) {
     cudaError_t rc;
     void *d_mem = NULL;
     float *d_ivec, *d_ovec, dresult;
-    const int blksize=256;
     int gridsize;
-    
+
+    /*** SETUP ***/
     getGPUProps(0, &devprops);
     dumpGPUProps(0, &devprops);
+
+    printf("Device results\n");
+    printf("kernel,trial,dresult,bytes,n,blksize,read,written,totalbytes,"
+	   " numFOps, ns, sec, Bytes/s, GB/s, FLOP/s, TFLOP/s\n");
 
     // not sure all corner cases are handled when n is not a multiple
     // of blocksize for the moment check and assert that it is 
     assert( ((n+blksize-1)/blksize)*blksize == n );
     
-    // all reductions will consume at most the same space (-1)
+    // allocate enough global device memory to hold the input vector
+    // and enough memory for all intermediate results produced during
+    // all "levels" of the reduction. Which will be at most the
+    // same size as the input (-1).  
     rc = cudaMalloc((void **)&d_mem, 2*bytes); 
     assert(rc == cudaSuccess);
-    d_ivec = (float *)d_mem;   
-    d_ovec = d_ivec;         // initial "last" output to be the first input
     
-    fprintf(stderr, "h_vec=%p d_mem=%p, d_ivec=%p d_ovec=%p"
-	    " bytes=%lu 2*bytes=%lu n=%u\n",
-	    h_vec, d_mem, d_ivec, d_ovec, bytes, 2*bytes, n);
+    // copy vector to start of device memory
     rc = cudaMemcpy(d_mem, h_vec, bytes, cudaMemcpyHostToDevice);
     assert(rc == cudaSuccess);
 
-    // Reduce will produce 1 value for each block
-    // loop until only 1 value left (output from a reduce on 1 block)
-    for (int len=n; len>1; len=len/blksize) {
-      d_ivec   = d_ovec;
-      d_ovec   = &(d_ivec[len]);  // place output to right of last input element
-      gridsize = (len + blksize - 1) / blksize; // ceil(len/blksize)
-      fprintf(stderr, "%d: reduce1<<<%d,%d,%d>>>(d_ivec=%p, d_ovec=%p)\n",
-	      len, gridsize, blksize, blksize*sizeof(float), d_ivec, d_ovec);
-      reduce1<<<gridsize,blksize,blksize*sizeof(float)>>>(d_ivec, d_ovec);
-      rc = cudaGetLastError();
-      if (rc != cudaSuccess) {
-	fprintf(stderr, "CUDA kernel launch failed: %s\n",
-		cudaGetErrorString(rc));
-	exit(EXIT_FAILURE);
+    for (int trial=0; trial<numtrials; trial++) {
+      // init the input and output to both start at the beginning of the data
+      d_ovec = d_ivec = (float *)d_mem;
+      
+      /*** Reductions ***/
+      // Reduce will produce 1 value for each block
+      // loop until only 1 value left (output from a reduce on 1 block)
+      assert(ts_now(&dstart));
+      for (int len=n; len>1; len=len/blksize) {
+	d_ivec   = d_ovec;
+	d_ovec   = &(d_ivec[len]);  // place output to right of last input element
+	gridsize = (len + blksize - 1) / blksize; // ceil(len/blksize)
+	
+	REDUCE_KERNEL(KNUM)<<<gridsize,blksize,blksize*sizeof(float)>>>(d_ivec,
+									d_ovec);
+	rc = cudaGetLastError();
+	assert(rc == cudaSuccess);
       }
+      rc = cudaDeviceSynchronize();
+      assert(ts_now(&dend));
+      assert(rc == cudaSuccess);
+      
+      /*** All done get result ***/
+      rc = cudaMemcpy(&dresult, d_ovec, sizeof(float), cudaMemcpyDeviceToHost);
+      assert(rc==cudaSuccess);
+            
+      // verify if cpu computation was done
+      if (cpuflg && result != dresult) {
+	fprintf(stderr, "ERROR: result = %f != *h_dresult = %f\n", result,
+		dresult);
+      }
+      
+      // calc performance stats and print
+      ns    = ts_diff(dstart,dend);
+      sec   = (double)ns/(double)NSEC_IN_SECOND;
+      flops = (double)numFOps/sec;
+      readbytes = 0; writtenbytes = 0;
+      for (int len=n; len>1; len=len/blksize) {
+        readbytes    += len;
+	writtenbytes += len/blksize;
+      }
+      readbytes *= sizeof(float); writtenbytes *= sizeof(float);
+      totalbytes = readbytes+writtenbytes;
+      bytespersec = (double)totalbytes/(double)sec;
+      gbpersec    = bytespersec/(double)1000000000.0;
+      printf(REDUCE_KERNEL_STR(KNUM)
+	     ",%d,%f,%lu,%lu,%d,%lu,%lu,%lu,%lu,%lu,%lf,%lf,%lf,%lf,%lf\n",
+	     trial, dresult, bytes, n, blksize, readbytes, writtenbytes,
+	     totalbytes, numFOps, ns, sec, bytespersec,
+	     gbpersec, flops, flops/TERA_OPS);
+      if (trial==0) {
+	minns=ns; minsec=sec; minflops=flops;
+      } else {
+	if (ns<minns) {
+	  minns          = ns;
+	  minsec         = sec;
+	  minflops       = flops;
+	  minbytespersec = bytespersec;
+	  mingbpersec    = gbpersec;
+	}
+      }
+      // reset intermediate result memory
+      rc = cudaMemset(((char *)d_mem + bytes), 0, bytes);
+      assert(rc == cudaSuccess);
+      rc = cudaDeviceSynchronize();
+      assert(rc == cudaSuccess);
     }
-    
-    rc = cudaDeviceSynchronize();
-    if (rc != cudaSuccess) {
-      fprintf(stderr, "cudaDeviceSynchronize failed: %s\n",
-	      cudaGetErrorString(rc));
-      exit(EXIT_FAILURE);
-    }
-
-    assert(rc==cudaSuccess);
-    
-    rc = cudaMemcpy(&dresult, d_ovec, sizeof(float), cudaMemcpyDeviceToHost);
-    if (rc != cudaSuccess) {
-      fprintf(stderr, "CUDAMemcpy failed (%p,%p,%d,cudaMemcpyDeviceToHost) dmem=%p (%lu): %s\n",
-	      &dresult, d_ovec, sizeof(float), d_mem, 2*bytes,
-	      cudaGetErrorString(rc));
-	exit(EXIT_FAILURE);
-    }
-    assert(rc==cudaSuccess);
+    /* cleanup */
     rc = cudaFree(d_mem);
-
-    if (cpuflg && result != dresult) {
-      fprintf(stderr, "ERROR: result = %f != *h_dresult = %f\n", result, dresult);
-    }
-    printf("device: %f\n", dresult);
+    assert(rc==cudaSuccess);
+    cudaDeviceReset();
+    printf(REDUCE_KERNEL_STR(KNUM)
+	   ",%d,%f,%lu,%lu,%d,%lu,%lu,%lu,%lu,%lu,%lf,%lf,%lf,%lf,%lf\n",
+	   -1, dresult, bytes, n, blksize, readbytes, writtenbytes, totalbytes,
+	   numFOps, minns, minsec, minbytespersec, mingbpersec, minflops,
+	   minflops/TERA_OPS);
   }
   
   free(h_vec);

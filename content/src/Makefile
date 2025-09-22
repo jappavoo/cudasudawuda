@@ -9,6 +9,9 @@ all: ${TARGETS}
 %.sass: %.cubin
 	nvdisasm -c $<  > $@
 
+%.uncommented.cu: %.cu
+	./cstrip $< > $@
+
 hello: hello.cu
 	nvcc $(CFLAGS) $< -o $@
 
@@ -33,8 +36,8 @@ occtest: occtest.cu
 occtest.cubin: occtest.cu
 	nvcc --cubin -gencode arch=compute_70,code=sm_70  $< -o $@
 
-reduce: reduce.cu
-	nvcc  $(CFLAGS)  $< -o $@
+reduce1: reduce.cu
+	nvcc  $(CFLAGS) -DKNUM=1  $< -o $@
 
 clean:
 	-${RM} -rf $(wildcard ${TARGETS} *.o *.cubin *.ptx *.cudafe* *.ii *.fatbin* *.reg* *.module_id *.sass jobs)
