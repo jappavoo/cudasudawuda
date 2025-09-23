@@ -3,7 +3,7 @@ set -x
 kernel=${1:-reduce1}
 declare -a blksizes=( 32 64 128 256 512 1024 )
 
-(( $# > 1 )) && shift 1
+(( $# >= 1 )) && shift 1
 (( $# > 0 )) && blksizes=( $@ )
 
 for bs in ${blksizes[@]}; do

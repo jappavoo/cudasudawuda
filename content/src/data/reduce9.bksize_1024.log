@@ -1,0 +1,2 @@
+reduce9: bytes=4294967296 n=1073741824 blksize=1024
+reduce9: reduce.cu:243: int main(int, char**): Assertion `rc == cudaSuccess' failed.

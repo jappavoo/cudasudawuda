@@ -97,6 +97,24 @@ void initData(float *data, uint64_t n) {
 
 #include "reduce1.cu"
 
+#include "reduce2.cu"
+
+#include "reduce3.cu"
+
+#include "reduce4.cu"
+
+#include "reduce5.cu"
+
+#include "reduce6.cu"
+
+#include "reduce7.cu"
+
+#include "reduce8.cu"
+
+#include "reduce9.cu"
+
+#define reduceKernel REDUCE_KERNEL(KNUM)
+#define reduceBytes  CONCAT(REDUCE_KERNEL(KNUM),bytes) 
 
 int main(int argc, char **argv) {
   uint64_t  bytes = 4 * GIGABYTE;
@@ -117,6 +135,9 @@ int main(int argc, char **argv) {
     }
     if (argc>2) {
       bytes = atoi(argv[2]);
+      if (argc>3) {
+	numtrials = atoi(argv[3]);
+      }
     }
   }
   
@@ -177,28 +198,58 @@ int main(int argc, char **argv) {
 
     for (int trial=0; trial<numtrials; trial++) {
       // init the input and output to both start at the beginning of the data
-      d_ovec = d_ivec = (float *)d_mem;
-      
+      d_ivec = (float *)d_mem;
+      d_ovec = &(d_ivec[n]);
       /*** Reductions ***/
       // Reduce will produce 1 value for each block
       // loop until only 1 value left (output from a reduce on 1 block)
       assert(ts_now(&dstart));
       for (int len=n; len>1; len=len/blksize) {
-	d_ivec   = d_ovec;
-	d_ovec   = &(d_ivec[len]);  // place output to right of last input element
 	gridsize = (len + blksize - 1) / blksize; // ceil(len/blksize)
-	
-	REDUCE_KERNEL(KNUM)<<<gridsize,blksize,blksize*sizeof(float)>>>(d_ivec,
-									d_ovec);
+#if KNUM == 4
+	if (gridsize != 1) {
+	  gridsize = gridsize / 2;
+	  len      = len / 2;
+	}
+#elif KNUM == 5
+	if (gridsize != 1) {
+	  gridsize = gridsize / 4;
+	  len      = len / 4;
+	}
+#elif KNUM == 6
+	if (gridsize != 1) {
+	  gridsize = gridsize / 8;
+	  len      = len / 8;
+	}
+#elif KNUM == 7
+	if (gridsize != 1) {
+	  gridsize = gridsize / 16;
+	  len      = len / 16;
+	}
+#elif KNUM == 8
+	if (gridsize != 1) {
+	  gridsize = gridsize / 32;
+	  len      = len / 32;
+	}
+#elif KNUM == 9
+	if (gridsize != 1) {
+	  gridsize = gridsize / 64;
+	  len      = len / 64;
+	}
+#endif
+
+	reduceKernel<<<gridsize,blksize,blksize*sizeof(float)>>>(d_ivec,d_ovec,n);
 	rc = cudaGetLastError();
 	assert(rc == cudaSuccess);
+	d_ivec   = d_ovec;
+	d_ovec   = &(d_ivec[gridsize]);  // place output to right of last input 
       }
       rc = cudaDeviceSynchronize();
       assert(ts_now(&dend));
       assert(rc == cudaSuccess);
       
       /*** All done get result ***/
-      rc = cudaMemcpy(&dresult, d_ovec, sizeof(float), cudaMemcpyDeviceToHost);
+      rc = cudaMemcpy(&dresult, d_ivec, sizeof(float), cudaMemcpyDeviceToHost);
       assert(rc==cudaSuccess);
             
       // verify if cpu computation was done
@@ -211,12 +262,7 @@ int main(int argc, char **argv) {
       ns    = ts_diff(dstart,dend);
       sec   = (double)ns/(double)NSEC_IN_SECOND;
       flops = (double)numFOps/sec;
-      readbytes = 0; writtenbytes = 0;
-      for (int len=n; len>1; len=len/blksize) {
-        readbytes    += len;
-	writtenbytes += len/blksize;
-      }
-      readbytes *= sizeof(float); writtenbytes *= sizeof(float);
+      reduceBytes(&readbytes, &writtenbytes,n,blksize);
       totalbytes = readbytes+writtenbytes;
       bytespersec = (double)totalbytes/(double)sec;
       gbpersec    = bytespersec/(double)1000000000.0;

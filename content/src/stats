@@ -1,0 +1,6 @@
+#!/bin/bash
+kern=${1:-reduce1}
+
+echo $kern
+grep "\-1" $kern.bksize_* | sort -t"," -k6,6 -n | cut -d"," -f 6,12,14,16 | while IFS=, read bs sec gbs flops ; do echo $bs $(echo "scale=2.;1000 * $sec" | bc) $flops $gbs; done
+
