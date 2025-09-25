@@ -12,8 +12,14 @@
 FROM quay.io/modh/cuda-notebooks:cuda-jupyter-minimal-ubi9-python-3.11-20250808
 
 USER root
-# add cmake so that nvidia samples can be built
+
+# add nvidia nsight-systems cli : https://docs.nvidia.com/nsight-systems/InstallationGuide/index.html
+RUN rpm --import https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub && \
+    dnf config-manager --add-repo "https://developer.download.nvidia.com/devtools/repos/rhel$(source /etc/os-release; echo ${VERSION_ID%%.*})/$(rpm --eval '%{_arch}' | sed s/aarch/arm/)/"
+    
+# add cmake so that nvidia samples can be built    
 RUN dnf install -y \
+  nsight-systems-cli \
   cmake && \
   yum clean all \
   && rm -rf /var/cache/yum/*

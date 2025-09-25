@@ -24,6 +24,16 @@ USER root
 # as per https://docs.nvidia.com/cuda/cuda-installation-guide-linux/#network-repo-installation-for-fedora
 # we do this so that additional repositories are available even non-NVIDIA ones
 
+# add nvidia nsight-systems cli : https://docs.nvidia.com/nsight-systems/InstallationGuide/index.html
+RUN rpm --import https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub && \
+    dnf config-manager --add-repo "https://developer.download.nvidia.com/devtools/repos/rhel$(source /etc/os-release; echo ${VERSION_ID%%.*})/$(rpm --eval '%{_arch}' | sed s/aarch/arm/)/"
+    
+# add cmake so that nvidia samples can be built    
+RUN dnf install -y \
+ nsight-systems-cli && \
+ yum clean all \
+ && rm -rf /var/cache/yum/*
+
 # DISTRO PACKAGES
 #  nerc minimal has all the based distro packages we need see
 #    https://github.com/nerc-images/csw-base-cuda-minimal/blob/main/Containerfile
@@ -69,4 +79,10 @@ RUN mkdir /home/csw && \
     done; \ 
     fix-permissions /home/csw 
 
+# Cats and dogs python packages
+RUN pip install \
+    numpy \
+    matplotlib \
+    pandas
+    
 USER 1001
