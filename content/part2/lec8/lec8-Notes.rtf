@@ -1,0 +1,400 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\csgray\c0;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf2 #SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-1\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 We have all grown to expect the system (SW & HW) to hide the complexities of physical memory from us via Virtual Memory.\
+\
+What are some of the benefits of virtual memory?\
+\
+0. Hide details of physical memory \'93geometry\'94 \'97 gaps\
+1. Simplified view of a contiguous address space\
+2. Provide an illusion of \'93infinite\'94 memory \'97 over-commitment \
+3. Access control \'97 including read-only memory, execute only, \
+4. Isolation \
+5. Memory-mapped I/O \'97 hide details of storage and network behind memory abstraction\
+\
+\
+Seems like a heterogeneous computing environment could benefit from Virtual Memory\
+\
+\
+\
+     
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-2\
+
+\f1\fs48 So far:\
+1. explicitly managed memory and data transfers\
+     alloc on host and gpu\
+     transfer data back and forth \
+     explicitly have two copies\
+\
+And this is how things were going for all the early years.\
+\
+As far as I can tell, it was AMD who first pushed for a virtual address space/virtual memory that spanned both the Host and Devices that compose a system. \
+HSA \'97 Heterogeneous System Architecture (2012): \'93Enable GPU computing as a first-class co-processor to the CPU via architecture definition\
+  \'97 2011 AM spec-driven goal of making heterogeneous parallel computing approachable by all programmers\
+   \'97 worked with ARM and others\'85. broad goals to be a unifying architecture, \
+shared virtual memory across CPU and GPU\
+\
+Both seem to start with predominantly software solutions and add hardware support in time.\
+\
+NVIDIA story seems to evolve as a catch-up and thus results in a lot of confusing terms and splintered functionality \'97 supposition \'97 careful not to use terminology established by HSA foundation and yet also imply support that in some sense really does not deliver until much later in the evolution, despite naming \'97 assume this is partially due to marketing\
+\
+We are roughly going to focus on the more recent support for CUDA 8+ (Pascal hardware and up). \'97 Zero copy (GPU maps memory and accesses via PCIe transactions)  \
+Volta \'97 real page faults, over subscription, etc.\
+\
+NOTE: NVIDIA 2020 is explicit:  Warns UM/Managed Memory is not about performance but rather programmability\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-3\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 Note the Managed\
+\
+Now we have a address space region where the same pointers are valid on both devices\
+\
+Allocate with cudaMallocManaged \'97 eg memory is managed by CUDA Runtime (driver)\
+\
+As we will see it the terms managed and unified get very blurry eventually past CUDA 8 and GPU\'92s pascal and beyond it is the same\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-4\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 So now we see NVIDIA make strides towards the  AMD HSA\
+\
+A unified model for heterogeneous devices all forming a single system \
+\
+At this point memory allocated via cuda MallocManaged is accessible by \
+ANY device that forms the system (assuming the right software and hardware)\
+\
+Runtime moves memory you don\'92t have to do the explicit copy\
+\
+\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-5\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 compare the code\
+\
+cudaMalloc becomes cudaMallocManaged\
+\
+remember kernel call is async\
+\
+on the left side we then explicitly allocate memory to copy value back\
+which is syncronous \
+\
+but on the right  we call \
+device syncronize \
+but then directly have the value\
+for us\
+\
+No at this stage in the evolution this happened primarily all in software with an explicit movement of data pages between the host and device and device and host \
+prior and post the kernel call \'85 as the hardware and software evolve we then will \
+have demand faults to let this happen async\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-6\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 Now we can have variables declared as managed and simply take the address of the symbol to pass to the GPU kernel\
+\
+This can also be done with local 
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-7\
+
+\f1\fs48 At this stage of evolution CUDA 6 (or no hardware/sw support for page faults)\
+Concurrent access is prohibited.\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-8\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 Transition seems to occur at CUDA 8 and Volta \
+introduces demand paging\
+Single copy of page migrated as needed\
+\
+There are configurations and scenarios in which the access can happen as a \'93Mapped\'94 access, that is to say, a page migration will not occur, but rather a bus transaction will be used to move the requested bytes\'85. details are very vague.\
+\
+Now, the exact features that are supported at the various possible configurations of HW and SW combinations are a bit dizzying.    We are going to focus on what the current and future is likely to look like (aka assume modern hardware and SW)\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-9\
+\
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-10\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 When all the stars align (eg, the proper config), then we can use the standard system allocators.   (If not, the next closest alternative is to explicitly use the managed allocator.)\
+\
+Look ma nothing but the kernel call\
+and a sync\
+\
+why do we need the sync?\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-11\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 Note we can pass an address from any part of our address space so\
+the first argement is a readonly string allocated by the compiler/link nice\
+the second string is a stack reference nice\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-12\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 statics work too\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-13\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 global work \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-14\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 external\
+\
+NOTE: This means that we can now pass memory that we did not create / manage\
+\
+\
+Much easier to integrate with libraries and other applications.\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-15\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 But many be this is the most important to note\
+\
+Memory mapped regions work \'97 and those backed by files!!!!\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-16\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 atomic access can work!!!\
+\
+but as we will see remember this can be a huge performance penalty depending on how the runtime and hardware are working\
+\
+\
+1. done via page migration (single copy of page bouncing around)\
+2. done via a mapping each access is reading remote memory over the interconnect\
+3. unified page table and coherent caches (only the most advanced hardware)\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-17\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 Perhaps one of the most important usabilty use cases is the sharing of complex data structure between host and the device\
+\
+example top array of strings \
+\
+Deep copy:\
+how uggly is it to manually copy this data structure over to the device (red code)\
+\
+recreate structure in device address space with new pointers and copy everything accross\
+\
+Imagine something even more complex\
+\
+\
+Versus just handing over the structure \'85. but of course you need to understand the performance implications.\
+\
+\
+likely use hints to runtime to improve the accesses\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-18\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 Ok so what is going on : Demand Paging\
+\
+We will assume descrite GPU with PCIe or \
+\
+Diagram devices now are sort of equivalent CPU vs GPU. eg proc A CPU proc B GPU\
+\
+Two page tables that reflect a shared virtual address space:\
+\
+1. general page fault physical memory allocation at time of access\
+    *addr1 = 1 on CPU will establish a page in the address map that is backed by memory on the procA (host)\
+2. Proc B has a virtual correspondence but has no access thus no backing page with the data\
+3. similarly lets assume that for page 2 it backing page exits on the GPU\
+4. Now lets walk through what might happen on the first touch of a address on the GPU\
+*addr3 = 1\
+\
+Next slide\
+\
+\
+Frontier is a mistake Summit (supercomputer decomissioned in 2024)  or Jetson embedded \
+\
+\
+ 
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-19\
+
+\f1\fs48 GPU physical page is allocated and mapped on the  GPU\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-20\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 Now lets assume two threads on Proc A access pointers that live on page 2 and page 3\
+\
+page fault is triggered \
+\
+next slide
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-21\
+
+\f1\fs48 Page MIGRATION\
+\
+physical pages are allocated on proc A\
+data is copied on the PCIe bus\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-22\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 and pages are unmapped on proc B\
+\
+Single copy of data is mapped on one device at a time\
+\
+classic distributed shared memory (see treadmarks)\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-23\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 Of course as we would expect we now can have over commitment\
+\
+\
+eg lets assume all pages of the proc A are physically holding data and mapped \
+\
+but then proc A touchs somthing on a page that it does not have.  \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-24\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 Like classic OS runtime picks a least recently uised page and evicts it data to some other device\
+\
+freeing a page\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-25\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 Migrate
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-26\
+
+\f1\fs48 Adjust page table
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-27\
+
+\f1\fs48 There is now hardware support that tracks accesses\
+and chooses to do bus transactions for data rather than migraitons depending on access threshold\
+\
+\
+Volta has access counters\
+\
+but to do direct access means OS and CPU hardware can also permit direct access over the bus without page migration \
+\
+\'93mapped\'94\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-28\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs48 Hints\
+\
+AsyncPrefetch\
+\
+too early and you might be kicking pages out or creating trouble for code that is currently running\
+\
+too late you are simply not getting value and you are back to faults\
+\
+prefetching takes effort but if you can do it you can try and get the best of both worlds\
+\
+\
+readonly \'97 multiple copies  \'97 invalidate if written\
+\
+\
+ 
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-29\
+
+\f1\fs48 skip this \
+look at on your own \
+\
+point is performance is subtle
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-30\
+
+\f1\fs48 remeber nothing like managing things on your own
+\f0\fs24 \
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-31\
+\
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-32\
+\
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-33\
+\
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-34\
+\
+#SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-35\
+\
+}
