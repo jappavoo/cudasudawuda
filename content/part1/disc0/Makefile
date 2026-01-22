@@ -5,7 +5,7 @@ LDFLAGS += -lpthread
 
 .PHONY: clean
 
-all: create0 create1 create2 create3 create4 args0 args1 barrier0 counter0
+all: create0 create1 create2 create3 create4 args0 args1 barrier0 counter0 counter1
 
 %: %.c
 	${CC} $(CFLAGS) $< -o $@ $(LDFLAGS)
