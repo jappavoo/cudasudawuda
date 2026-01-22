@@ -5,8 +5,10 @@ LDFLAGS += -lpthread
 
 .PHONY: clean
 
-create0: create0.c
-	${CC} $(CFLAGS) $(LDFLAGS) $< -o $@ 2>&1 | tee make.out
+all: create0 create1 create2 create3 create4 args0 args1 barrier0 counter0
+
+%: %.c
+	${CC} $(CFLAGS) $< -o $@ $(LDFLAGS)
 
 clean:
-	-@${RM} !(Makefile|siggen.c|README.md)
+	-@${RM} !(Makefile|*.c|README.md)

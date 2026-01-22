@@ -17,6 +17,9 @@ int main()
   
   rc = pthread_create(&tid, NULL, func, NULL);
   assert(rc == 0);
+
+  rc = pthread_join(tid, NULL);
+  assert(rc == 0);
   
   return 0;
 }

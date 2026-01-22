@@ -10,12 +10,17 @@ void * func(void *arg)
 
 int main()
 {
-  pthread_t tid;
+  pthread_t tid[10];
   int rc;
   
   printf("Hello from main thread\n");
+
+  for (int i=0; i<10; i++) {
+    rc = pthread_create(&(tid[i]), NULL, func, NULL);
+    assert(rc == 0);
+  }
   
-  rc = pthread_create(&tid, NULL, func, NULL);
+  rc = pthread_join(tid[0], NULL);
   assert(rc == 0);
   
   return 0;
