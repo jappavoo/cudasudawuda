@@ -76,7 +76,11 @@ RUN mkdir /home/csw && \
     git clone https://github.com/jappavoo/batchtools.git && \
     for f in /home/csw/batchtools/b*; do \
        ln -s $f /usr/local/bin/$(basename $f); \
-    done; \ 
+    done && \
+    git clone -b metrics https://github.com/OCP-on-NERC/python-batchtools.git && \
+    cd python-batchtools && \
+    pip install -e . && \
+    cd .. && \
     fix-permissions /home/csw 
 
 # Cats and dogs python packages

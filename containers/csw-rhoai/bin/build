@@ -1,4 +1,10 @@
 #!/bin/bash
+img=$1
 
-podman build -f Containerfile.dev -t jappavoo/csw-dev:nerctest-current .
-podman build -f Containerfile.run -t jappavoo/csw-run:nerctest-current .
+[[ -z $img || $img == dev ]] && {
+    podman build -f Containerfile.dev -t jappavoo/csw-dev:nerctest-current .
+}
+
+[[ -z $img || $img == run ]] && {
+    podman build -f Containerfile.run -t jappavoo/csw-run:nerctest-current .
+}
