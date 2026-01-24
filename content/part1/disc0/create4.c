@@ -12,10 +12,7 @@ int main()
 {
   pthread_t tid[10];
   int rc, i;
-  pthread_barrier_t barrier; 
-  pthread_barrierattr_t attr;
   
-  rc = pthread_barrier_init(&barrier, &attr, 11);  
   printf("Hello from main thread\n");
 
   for (i=0; i<10; i++) {
@@ -30,4 +27,3 @@ int main()
   
   return 0;
 }
-

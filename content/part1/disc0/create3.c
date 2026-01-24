@@ -12,7 +12,7 @@ int main()
 {
   pthread_t tid[10];
   int rc, i;
-
+  
   printf("Hello from main thread\n");
 
   for (i=0; i<10; i++) {
@@ -21,10 +21,9 @@ int main()
   }
 
   for (i=0; i<10; i++) {
-    rc = pthread_join(tid[i], NULL);
+    rc = pthread_join(tid[0], NULL);
     assert(rc == 0);
   }
   
   return 0;
 }
-
