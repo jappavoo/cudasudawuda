@@ -14,6 +14,9 @@ all: ${TARGETS}
 %.uncommented.cu: %.cu
 	./cstrip $< > $@
 
+vecadd: vecadd.c
+	gcc -O1 $< -o $@
+
 hello: hello.cu
 	nvcc $(CFLAGS) $< -o $@
 
