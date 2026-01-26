@@ -6,38 +6,32 @@
 #define DIM 1024
 long A[DIM], B[DIM], C[DIM];
 
-void
-vecAdd(long *a, long *b, long *c, int dim)
-{
+// The work
+void vecAdd(long *a, long *b, long *c, int dim) {
   for (int i=0; i<dim; i++) {
     c[i] = a[i] + b[i];
   }
 }
 
-void loadVec(long *v, int dim)
-{
+// dummy load
+void loadVec(long *v, int dim) {
   for (int i=0; i<dim; i++) {
     v[i] = rand();
   }
 }
 
 // struct to pass args to work thread
-struct wargs {
-  int dim;
-  long *a, *b, *c;
-};
+struct wargs { int dim; long *a, *b, *c; };
 
 // entry point for additional worker thread
 //  1. unpack arguments, and
 //  2. call vecAdd
-void *worker(void *arg)
-{
+void *worker(void *arg) {
   struct wargs *wa = arg;
   vecAdd(wa->a, wa->b, wa->c, wa->dim);
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   struct wargs wa;
   pthread_t tid;
   int rc, hd;
