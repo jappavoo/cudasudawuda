@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 
-int counter = 0;
+volatile int counter = 0;
 
 void *func(void *)
 {

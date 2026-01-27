@@ -2,9 +2,11 @@
 #include <assert.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
 pthread_barrier_t bar;
-int counter = 0;
+volatile int counter = 0;
 
 void *func(void *)
 {
@@ -25,7 +27,10 @@ int main(int argc, char **argv)
 
   for (i=0; i<n; i++) {
     rc = pthread_create(&(tid[i]), NULL, func, NULL);
-    assert(rc == 0);
+    if (rc != 0 ) {
+      fprintf(stderr, "ERROR: %s\n", strerror(rc));
+      exit(-1);
+    }
   }
 
   for (i=0; i<n; i++) {
