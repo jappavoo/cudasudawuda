@@ -2,13 +2,13 @@
 type=$1
 DATE_TAG=$(date +"_%m.%d.%y_%H.%M.%S")
 
-[[ -z $img || $img == dev ]] && {
+[[ -z $type || $type == dev ]] && {
     podman tag  jappavoo/csw-dev:nerctest-current jappavoo/csw-dev:nerctest-${DATE_TAG}
     podman push jappavoo/csw-dev:nerctest-${DATE_TAG} quay.io/jappavoo/csw-dev:nerctest-${DATE_TAG}
     podman push jappavoo/csw-dev:nerctest-current quay.io/jappavoo/csw-dev:nerctest-current
 }
 
-[[ -z $img || $img == run ]] && {
+[[ -z $type || $type == run ]] && {
     podman tag  jappavoo/csw-run:nerctest-current jappavoo/csw-run:nerctest-${DATE_TAG}
     podman push jappavoo/csw-run:nerctest-${DATE_TAG} quay.io/jappavoo/csw-run:nerctest-${DATE_TAG}
     podman push jappavoo/csw-run:nerctest-current quay.io/jappavoo/csw-run:nerctest-current
