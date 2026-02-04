@@ -1,0 +1,11 @@
+SHELL := /bin/bash -O extglob
+CFLAGS += -gencode arch=compute_70,code=sm_70
+CFLAGS += --ptxas-options=-v
+
+.PHONY: clean
+
+hello: hello.cu
+        nvcc $(CFLAGS) hello.cu -o hello 2>&1 | tee make.out
+
+clean:
+        rm -f hello make.out
