@@ -2,6 +2,7 @@
 \cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;}
 {\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red20\green20\blue20;}
 {\*\expandedcolortbl;;\csgray\c0;\cssrgb\c10196\c10196\c10196;}
+\vieww16800\viewh17760\viewkind0
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 
 \f0\fs24 \cf2 #SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-1\
@@ -22,34 +23,36 @@ block execution order is arbitary and \'93stikcks to a SM\'94 \
 \
 \
 #SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-3\
-nice property is that it ensure both\
-1. all threads are at the same point. \'97 the obvious and easy to understand\
-2. all writes are visible \'97 includes a memory fence!  more on this\
+nice property is that it ensures both\
+1. All threads are at the same point. \'97 the obvious and easy to understand\
+2. All writes are visible \'97 includes a memory fence!  more on this\
 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+- So how can we sync across all threads for all blocks?\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \
-so how can we sync across threads of all blocks?\
-\
-break our work in two  kernels \
-kernel execution in a stream is serial.\
-kernel 2 waits for one\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+- Break our work into two kernels.\
+  - Kernel execution in a stream is serial.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+  - kernel 2 waits for one\
  \
 \
 #SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-4\
-Some other fancy syncs that inlude computation\
-but not discussed much  \'97 seems people don\'92t really use them\
-\
-Except the last one \
-\
-returns the value to all thread\
+- Some other fancy syncs that include computation\
+- but not discussed much  \'97 seems people don\'92t really use them except the last one \
+- count, and, or : Returns the value to all threads\
 \
 \
 #SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-5\
-before we go on it is worth noting there are now some advanced features\
-that extend what we have learnt and perhaps even break it\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+Before we go on it is worth noting that there are now some advanced features\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+that extends what we have learnt and perhaps even breaks it\
 \
-CGs:  care group threads both with and across block allowing you to barrier in finer granuality\
-as a matter of fact even bigger\'85. claim is that hardware is acclerates these based on HPC\
-I assume some form of combining tree to get logrithm messages exchanged\
+CGs:  care group threads both with and across blocks, allowing you to barrier in finer granularity\
+as a matter of fact, even bigger\'85. The claim is that hardware is acclerates these based on HPC\
+I assume some form of combining tree to get logarithm messages exchanged\
 \
 Graphs:\
 Allow one to combine CUDA commands from one or more streams into a more complex unit\
@@ -63,20 +66,16 @@ eg. lock\
 but remeber we want to avoid this as much as possible\
 \
 #SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-7\
-Quick basic reminder of why we need mutual exclusion\
+- Quick basic reminder of why we need mutual exclusion\
+- Shared counter that we want to increment\
+- 4 threads of a warp \
 \
-Shared counter that we want to increment\
-\
-4 threads of a warp \
-\
-assume 42 \
-and one and then 43\
-all write to count \
-\
-This is not likely what we want.\
-\
-we want a critical section around ++\
-one at a time\
+- assume value 42 \
+   -  Add one and then 43\
+   - All write to count \
+- This is not likely what we want.\
+- We want a critical section around ++\
+   - one at a time\
 \
 \
 \
@@ -186,16 +185,13 @@ I want to let you know that there are a bunch very interesting preimitive for do
 within a warp\
 \
 can exchange data and compute lane wide global values\
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \
 Not going into details \'97 see manual\
 \
 \
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \
 \
 #SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-17\
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 my intuituion is that one can creatively use these to squeeze out more performance (but buyer be ware \'97 sleep is also a nice thing)\
 #SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-18\
 On to our final topic\
@@ -204,38 +200,31 @@ Classic system optimization\
 \
 pipeline\
 \
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \
 #SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-19\
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 My main goal is to point out these features so you are aware but not to cover them in depth\
 \
 you can read the manuals and look at examples\
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \
 #SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-20\
+\
+- programming interface object-oriented\
+- create object\
+    - auto block = cooperateive_groups::this_thread_block();\
+- to wait\
+   - block.sync()\
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
-\
-programmig interface object  oriented\
-\
-create object\
-auto block = cooperateive_groups::this_thread_block();\
-\
-to wait\
-block.sync()\
 
 \f1 \expnd0\expndtw0\kerning0
-\outl0\strokewidth0 \strokec3 \
-TMA is another new async memory feature that has been added.\
+- TMA is another new async memory feature that has been added.\
 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 
-\f0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \
+\f0 \kerning1\expnd0\expndtw0 \
 #SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-21\
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
-A big goal has been to evolve the model to avoid the amount of time we \
-are waiting for I/O but getting overlaps \
-also get compute overlap \
+- A big goal has been to evolve the model to avoid the amount of time we  are waiting for I/O \
+  - by overlapping I/O between host and GPU (and vice versa)\
+  - also get compute overlapping \
 \
 Key mechanism is streams\
 #SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-22\
@@ -250,7 +239,6 @@ create a stream get a handle and add work to it\
 \
 need the resouce and to break up your work appropriately \
 for this to be worth while\
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \
 #SLIDEPILOT-NOTES-PAGE-SEPARATOR#-Page-23\
 \

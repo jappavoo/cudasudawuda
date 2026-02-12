@@ -77,10 +77,17 @@ fi
 
 echo $pages
 
-for page in $pages; do
-    ofile=$(printf "$output/%03d.$DIOFORMAT" $page)
+if [[ $DIOFORMAT == pdf ]]; then
     (( VERBOSE )) && {
-	echo "$DIO -x  -f $DIOFORMAT $DIOTRANSPARENT -b $DIOBORDER -s $DIOSCALE --width ${DIOWIDTH} -p $page $input -o $ofile"
+	echo "$DIO -x  -f $DIOFORMAT $DIOTRANSPARENT -b $DIOBORDER -s $DIOSCALE --width ${DIOWIDTH} -g 1..${count} $input -o ${output}.pdf"
     }
-    $DIO -x  -f $DIOFORMAT $DIOTRANSPARENT -b $DIOBORDER -s $DIOSCALE --width ${DIOWIDTH} -p $page $input -o $ofile 2>/dev/null
-done
+    $DIO -x  -f $DIOFORMAT $DIOTRANSPARENT -b $DIOBORDER -s $DIOSCALE --width ${DIOWIDTH} -g 1..${count} $input -o ${output}.pdf 2>/dev/null
+else
+    for page in $pages; do
+	ofile=$(printf "$output/%03d.$DIOFORMAT" $page)
+	(( VERBOSE )) && {
+	    echo "$DIO -x  -f $DIOFORMAT $DIOTRANSPARENT -b $DIOBORDER -s $DIOSCALE --width ${DIOWIDTH} -p $page $input -o $ofile"
+	}
+	$DIO -x  -f $DIOFORMAT $DIOTRANSPARENT -b $DIOBORDER -s $DIOSCALE --width ${DIOWIDTH} -p $page $input -o $ofile 2>/dev/null
+    done
+fi
