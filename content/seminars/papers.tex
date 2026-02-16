@@ -1,0 +1,78 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{pdfpages}
+\usepackage{hyperref}
+\usepackage{verbatim}
+
+\begin{document}
+
+\tableofcontents
+
+\phantomsection
+\addcontentsline{toc}{section}{Scalable Parallel Programming with CUDA}
+\includepdf[pages=2-]{papers/scalable_parallel_CUDA.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{NVIDIA Tesla: A Unified Graphics and Computing Architecture}
+\includepdf[pages=-]{papers/NVIDIA_Tesla.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{Clipper: A Low-Latency Online Prediction Serving System}
+\includepdf[pages=-]{papers/nsdi17-crankshaw.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{Data Parallel Algorithms}
+\includepdf[pages=-]{papers/Data_Parallel_Algorithms.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{Efficient Parallel Scan Algorithms for GPUs}
+\includepdf[pages=-]{papers/Parallel_Scan.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{Brook for GPUs: Stream Computing on Graphics Hardware}
+\includepdf[pages=2-]{papers/Brook.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{Virtual Thread: Maximizing Thread-Level Parallelism beyond GPU Scheduling Limit}
+\includepdf[pages=-]{papers/Virtual_Thread.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{Dynamic Warp Formation: Efficient MIMD Control Flow on SIMD Graphics Hardware}
+\includepdf[pages=2-]{papers/Dynamic_Warp_Formation.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{Simultaneous Branch and Warp Interweaving for Sustained GPU Performance}
+\includepdf[pages=-]{papers/Branch_Warp_Interweaving.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{GPU-Initiated On-Demand High-Throughput Storage Access in the BaM System Architecture}
+\includepdf[pages=2-]{papers/BaM.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{Torpor: GPU-Enabled Serverless Computing for Low-Latency, Resource-Efficient Inference}
+\includepdf[pages=-]{papers/Torpor.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{Towards GPU Memory Efficiency for Distributed Training at Scale}
+\includepdf[pages=2-]{papers/Distributed_Training.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{LithOS: An Operating System for Efficient Machine Learning on GPUs}
+\includepdf[pages=2-]{papers/LithOS.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{Mercury: Unlocking Multi-GPU Operator Optimization for LLMs via Remote Memory Scheduling}
+\includepdf[pages=2-]{papers/Mercury.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{Managing Scalable Direct Storage Accesses for GPUs with GoFS}
+\includepdf[pages=2-]{papers/GoFS.pdf}
+
+\phantomsection
+\addcontentsline{toc}{section}{AutoOverlap: Enabling Fine-Grained Overlap of Computation and Communication with Chunk-Based Scheduling}
+\includepdf[pages=-]{papers/AutoOverlap.pdf}
+
+\end{document}
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: t
+%%% End:
